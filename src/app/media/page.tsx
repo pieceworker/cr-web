@@ -72,6 +72,7 @@ export default function MediaPage() {
               alt={`Gallery image ${i}`}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
+              unoptimized
             />
           </div>
         ))}
@@ -99,6 +100,7 @@ export default function MediaPage() {
               alt="Full view"
               fill
               className="object-contain"
+              unoptimized
             />
           </div>
 
