@@ -80,31 +80,48 @@ export default function MediaPage() {
 
       {/* Lightbox Modal */}
       {selectedIdx !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-          {/* Close Button */}
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 touch-none"
+          onClick={() => setSelectedIdx(null)} // Click background to close
+        >
+          {/* Close Button - High Z-Index */}
           <button
-            onClick={() => setSelectedIdx(null)}
-            className="absolute top-5 right-5 text-white text-4xl hover:text-red-600 z-[60]"
+            onClick={(e) => { e.stopPropagation(); setSelectedIdx(null); }}
+            className="absolute top-6 right-6 text-white text-5xl font-light hover:text-red-600 z-[70] transition-colors leading-none"
+            aria-label="Close lightbox"
           >
             &times;
           </button>
 
-          {/* Navigation */}
-          <button onClick={showPrev} className="absolute left-4 text-white text-4xl p-4 hover:bg-white/10 rounded-full transition-colors">
+          {/* Navigation - High Z-Index & Mobile Optimized Targets */}
+          <button 
+            onClick={(e) => { e.stopPropagation(); showPrev(); }} 
+            className="absolute left-2 md:left-6 text-white text-5xl md:text-6xl p-4 z-[70] hover:text-red-600 transition-all"
+            aria-label="Previous image"
+          >
             &lsaquo;
           </button>
 
-          <div className="relative w-full h-full max-w-5xl max-h-[80vh]">
+          {/* Image Container - Lower Z-Index than buttons */}
+          <div 
+            className="relative w-full h-full max-w-5xl max-h-[85vh] z-60"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image
+          >
             <Image
               src={`${images[selectedIdx]}`}
               alt="Full view"
               fill
-              className="object-contain"
+              className="object-contain pointer-events-none select-none"
               unoptimized
+              priority
             />
           </div>
 
-          <button onClick={showNext} className="absolute right-4 text-white text-4xl p-4 hover:bg-white/10 rounded-full transition-colors">
+          <button 
+            onClick={(e) => { e.stopPropagation(); showNext(); }} 
+            className="absolute right-2 md:right-6 text-white text-5xl md:text-6xl p-4 z-[70] hover:text-red-600 transition-all"
+            aria-label="Next image"
+          >
             &rsaquo;
           </button>
         </div>
