@@ -1,5 +1,6 @@
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer'; // New import
 import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -9,7 +10,6 @@ export const metadata = {
 	description: 'Bringing classical music to neighborhood hangouts since 2006.',
 };
 
-// We make this function "async" so we can await the session
 export default async function RootLayout({
 	children,
 }: {
@@ -17,13 +17,12 @@ export default async function RootLayout({
 }) {
 	return (
 		<html lang="en">
-			{/* Updated body: Removed hardcoded bg-black to support light mode */}
-			<body className={`${inter.className} antialiased bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen transition-colors`}>
-				{/* 2. Pass the session into your AuthProvider */}
+			<body className={`${inter.className} antialiased bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col transition-colors`}>
 				<Navbar />
-				<main className="w-full">
+				<main className="w-full flex-grow">
 					{children}
 				</main>
+				<Footer /> {/* Global Footer added here */}
 			</body>
 		</html>
 	);
