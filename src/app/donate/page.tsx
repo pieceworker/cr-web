@@ -8,8 +8,7 @@ export default function DonatePage() {
           Support
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 text-lg">
-          Help us keep chamber music accessible. Your donations pay our musicians
-          and keep the &ldquo;Chamber Jams&rdquo; free for the community.
+          Help us keep chamber music accessible. Your donations help pay musicians for performing at our events.
         </p>
       </section>
 

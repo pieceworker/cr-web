@@ -67,7 +67,7 @@ export default function AboutPage() {
             The Community
           </h3>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            From conservatory students to seasoned professionals, our network
+            From highly skilled amateurs to seasoned professionals, our network
             thrives on the &ldquo;Chamber Jam&rdquo; format&mdash;spontaneous, high-energy
             collaborations that invite the audience into the process.
           </p>
