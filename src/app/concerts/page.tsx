@@ -13,6 +13,16 @@ export default function ConcertsPage() {
       // Use YYYY-MM-DD for comparison logic
       isoDate: "2026-01-27" 
     },
+    {
+      date: "Feb 3",
+      time: "7:00 PM",
+      venue: "Napoleon Street Gallery",
+      city: "San Francisco",
+      program: "Mendelssohn Birthday House Concert",
+      link: "https://www.eventbrite.com/e/1981908731367",
+      // Use YYYY-MM-DD for comparison logic
+      isoDate: "2026-02-03" 
+    },
   ];
 
   // Filter events: Keep only those where the event date is today or in the future
