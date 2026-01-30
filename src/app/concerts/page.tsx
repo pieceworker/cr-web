@@ -64,22 +64,30 @@ export default function ConcertsPage() {
               key={i}
               className="group border border-zinc-200 dark:border-zinc-800 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
             >
-              <div>
-                {/* Date/Time Tag */}
-                <div className="text-red-600 font-bold tracking-widest uppercase text-sm mb-1">
-                  {event.date} • {event.time}
+              {/* Linked Content Area */}
+              <Link 
+                href={event.link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <div>
+                  {/* Date/Time Tag */}
+                  <div className="text-red-600 font-bold tracking-widest uppercase text-sm mb-1">
+                    {event.date} • {event.time}
+                  </div>
+
+                  {/* Program Name (Emphasized) */}
+                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-white group-hover:text-red-600 transition-colors leading-tight">
+                    {event.program}
+                  </h2>
+
+                  {/* Venue and City (Secondary) */}
+                  <p className="text-zinc-600 dark:text-zinc-500 font-medium">
+                    {event.venue}, {event.city}
+                  </p>
                 </div>
-
-                {/* Program Name (Emphasized) */}
-                <h2 className="text-2xl font-bold text-zinc-900 dark:text-white group-hover:text-red-600 transition-colors leading-tight">
-                  {event.program}
-                </h2>
-
-                {/* Venue and City (Secondary) */}
-                <p className="text-zinc-600 dark:text-zinc-500 font-medium">
-                  {event.venue}, {event.city}
-                </p>
-              </div>
+              </Link>
 
               {/* Action Button */}
               <Link
