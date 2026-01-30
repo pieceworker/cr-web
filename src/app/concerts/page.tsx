@@ -23,6 +23,16 @@ export default function ConcertsPage() {
       // Use YYYY-MM-DD for comparison logic
       isoDate: "2026-02-03" 
     },
+    {
+      date: "Feb 14",
+      time: "7:00 PM",
+      venue: "Red Poppy Art House",
+      city: "San Francisco",
+      program: "The Musical Art Quintet",
+      link: "https://www.eventbrite.com/e/1980912022183",
+      // Use YYYY-MM-DD for comparison logic
+      isoDate: "2026-02-14" 
+    },
   ];
 
   // Filter events: Keep only those where the event date is today or in the future
