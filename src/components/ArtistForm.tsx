@@ -352,9 +352,9 @@ export default function ArtistForm({
                             }`}
                         disabled={(!isDirty && !reviewRequestId) || (isPending && !isAdmin && !reviewRequestId) || isUploading}
                     >
-                        {isUploading ? "Uploading..." : (reviewRequestId ? "Approve & Save Changes" : (isAdmin ? (isEdit ? "Save Artist Changes" : "Create Artist") : (isPending ? "Request Pending" : (isEdit ? "Request Profile Update" : "Create Artist"))))}
+                        {isUploading ? "Uploading..." : (isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? (isEdit ? "Save Artist Changes" : "Create Artist") : (isPending ? "Request Pending" : (isEdit ? "Request Profile Update" : "Create Artist"))))}
                     </button>
-                    {reviewRequestId && (
+                    {isAdmin && reviewRequestId && (
                         <button
                             type="button"
                             onClick={() => {
