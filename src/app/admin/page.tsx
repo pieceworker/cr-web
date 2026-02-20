@@ -45,23 +45,36 @@ async function getAdminData() {
         };
     }));
 
-    const users = await db.prepare("SELECT * FROM users").all();
+    const usersResult = await db.prepare("SELECT * FROM users").all();
+    const users = usersResult.results as unknown as User[];
 
-    // Fetch all unique images from artists and bookings that are stored in R2
-    const artistImages = await db.prepare("SELECT id, name, image FROM artists WHERE image LIKE '/api/image/%'").all();
-    const bookingImages = await db.prepare("SELECT id, name, image FROM bookings WHERE image LIKE '/api/image/%'").all();
+    // Fetch all artists and bookings to match R2 images against
+    const allArtists = artists.results as unknown as Artist[];
+    const allBookings = bookingsRes.results as unknown as Booking[];
 
-    const uploadedImages = [
-        ...(artistImages.results as { id: string, name: string, image: string }[]).map(img => ({ ...img, type: 'artist' })),
-        ...(bookingImages.results as { id: string, name: string, image: string }[]).map(img => ({ ...img, type: 'booking' }))
-    ];
+    // Use R2 binding as source of truth for images
+    const r2List = await env.R2.list();
+    const uploadedImages = r2List.objects.map(obj => {
+        const url = `/api/image/${obj.key}`;
+
+        // Find matching artist or booking
+        const artist = allArtists.find(a => a.image === url);
+        const booking = allBookings.find(b => b.image === url);
+
+        return {
+            id: artist?.id || booking?.id || obj.key,
+            name: artist?.name || booking?.name || obj.key,
+            image: url,
+            type: artist ? 'artist' : (booking ? 'booking' : 'unlinked')
+        };
+    });
 
     return {
         requests: (requestsRes.results as unknown as UnifiedRequest[] || []),
         chapters: (chapters.results as unknown as Chapter[] || []),
-        artists: (artists.results as unknown as Artist[] || []),
+        artists: allArtists,
         bookings: bookingsWithDates,
-        users: (users.results as unknown as User[] || []),
+        users,
         uploadedImages
     };
 }
@@ -190,18 +203,25 @@ export default async function AdminPage() {
                 <h2 className={SECTION_HEADER}>Uploaded Images ({uploadedImages.length})</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-6">
                     {uploadedImages.map((img) => (
-                        <Link
+                        <div
                             key={img.image}
-                            href={img.type === 'artist' ? `/artists/${img.id}` : `/bookings/${img.id}`}
                             className="group block bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-2 hover:border-red-600 transition-all shadow-sm"
                         >
-                            <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden">
-                                <Image src={img.image} alt={img.name} fill className="object-cover" unoptimized />
-                            </div>
-                            <div className="mt-2 text-[8px] font-black uppercase tracking-tighter truncate text-zinc-500 group-hover:text-red-600">
-                                {img.name}
-                            </div>
-                        </Link>
+                            <Link
+                                href={img.type === 'unlinked' ? img.image : (img.type === 'artist' ? `/artists/${img.id}` : `/bookings/${img.id}`)}
+                                target={img.type === 'unlinked' ? "_blank" : undefined}
+                            >
+                                <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden">
+                                    <Image src={img.image} alt={img.name} fill className="object-cover" unoptimized />
+                                </div>
+                                <div className="mt-2 text-[8px] font-black uppercase tracking-tighter truncate text-zinc-500 group-hover:text-red-600">
+                                    {img.type === 'unlinked' ? 'Unlinked File' : img.name}
+                                </div>
+                                <div className="text-[6px] font-bold text-zinc-400 truncate uppercase tracking-tighter">
+                                    {img.type === 'unlinked' ? img.id : `${img.type}: ${img.id}`}
+                                </div>
+                            </Link>
+                        </div>
                     ))}
                     {uploadedImages.length === 0 && (
                         <div className="col-span-full py-12 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-800">
