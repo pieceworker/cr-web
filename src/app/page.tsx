@@ -18,10 +18,10 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href="/concerts"
+              href="/events"
               className="inline-flex items-center justify-center bg-zinc-900 text-white dark:bg-white dark:text-black px-8 h-14 font-bold hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all text-center uppercase"
             >
-              Find a Concert
+              Find an Event
             </Link>
             <Link
               href="/be-involved"

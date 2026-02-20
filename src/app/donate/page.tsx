@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function DonatePage() {
   return (
-    <div className="flex flex-col gap-10 py-10 px-6 max-w-2xl mx-auto text-center transition-colors">
+    <div className="flex flex-col gap-10 py-10 px-6 max-w-6xl mx-auto text-center transition-colors">
       <section className="space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic text-zinc-900 dark:text-white">
           Support

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default async function BeInvolvedPage() {
   return (
-    <div className="flex flex-col gap-16 py-10 px-6 max-w-5xl mx-auto transition-colors">
+    <div className="flex flex-col gap-16 py-10 px-6 max-w-6xl mx-auto transition-colors">
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic text-zinc-900 dark:text-white">
           Join The Revolution

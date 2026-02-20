@@ -34,7 +34,35 @@
 	],
 	"observability": {
 		"enabled": true
-	}
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "cr-db",
+			"database_id": "52a7bdb2-cce7-46bb-9e2b-1c8ca2377fb7",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "R2",
+			"bucket_name": "cr-r2"
+		}
+	],
+	"routes": [
+		{
+			"pattern": "classicalrevolution.org",
+			"zone_name": "classicalrevolution.org",
+			"custom_domain": true
+		},
+		{
+			"pattern": "www.classicalrevolution.org",
+			"zone_name": "classicalrevolution.org",
+			"custom_domain": true
+		}
+	],
+	"workers_dev": true,
+	"preview_urls": true
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

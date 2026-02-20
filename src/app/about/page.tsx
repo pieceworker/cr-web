@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function AboutPage() {
   return (
-    <div className="flex flex-col gap-10 md:gap-16 py-10 px-6 max-w-4xl mx-auto overflow-x-hidden transition-colors">
+    <div className="flex flex-col gap-10 md:gap-16 py-10 px-6 max-w-6xl mx-auto overflow-x-hidden transition-colors">
       {/* Header Section */}
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic underline decoration-red-600 underline-offset-8 text-zinc-900 dark:text-white">
