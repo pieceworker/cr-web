@@ -79,7 +79,7 @@ export default function ArtistForm({
             membersChanged ||
             imagePreference !== (pendingData?.image_preference ?? artist?.image_preference ?? "custom") ||
             file !== null;
-    }, [name, location, bio, selectedChapters, selectedMembers, file, artist, pendingData, currentUserId]);
+    }, [name, location, bio, selectedChapters, selectedMembers, imagePreference, file, artist, pendingData, currentUserId]);
 
     const INPUT = "w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm disabled:bg-zinc-100 dark:disabled:bg-zinc-900 disabled:text-zinc-500";
     const LABEL = "block text-[10px] font-bold uppercase text-zinc-400 mb-1 tracking-widest";

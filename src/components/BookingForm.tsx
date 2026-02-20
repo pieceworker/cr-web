@@ -115,7 +115,7 @@ export default function BookingForm({
             datesChanged ||
             imagePreference !== (pendingData?.image_preference ?? booking?.image_preference ?? 'custom') ||
             file !== null;
-    }, [name, email, phone, questions, dates, initialDates, file, pendingData, booking, initialUserData]);
+    }, [name, email, phone, questions, dates, initialDates, imagePreference, file, pendingData, booking, initialUserData]);
 
     const addDate = () => {
         if (dates.length < 100 && !disabled) {
@@ -381,9 +381,9 @@ export default function BookingForm({
                                     <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">Google Profile Photo</p>
                                     <div className="w-24 h-24 rounded-full border-2 border-red-600 overflow-hidden relative">
                                         {/* Since we don't always have initialUserData here, we might need to show a placeholder or fetch it */}
-                                        {(booking as any)?.user_image || (booking as any)?.user?.image ? (
+                                        {(booking as Booking & { user_image?: string; user?: { image?: string } })?.user_image || (booking as Booking & { user_image?: string; user?: { image?: string } })?.user?.image ? (
                                             <Image
-                                                src={(booking as any)?.user_image || (booking as any)?.user?.image}
+                                                src={(booking as Booking & { user_image?: string; user?: { image?: string } })?.user_image || (booking as Booking & { user_image?: string; user?: { image?: string } })?.user?.image || ""}
                                                 alt="Google Photo"
                                                 fill
                                                 className="object-cover"
