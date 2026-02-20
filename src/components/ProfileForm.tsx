@@ -126,7 +126,7 @@ export default function ProfileForm({
                             <option value="Audience">Audience</option>
                             <option value="Musician">Musician</option>
                             <option value="Chapter Director">Chapter Director</option>
-                            {isAdmin && <option value="Admin">Admin</option>}
+                            {user.role === "Admin" && <option value="Admin" disabled>Admin</option>}
                         </select>
                     </div>
                 </div>
