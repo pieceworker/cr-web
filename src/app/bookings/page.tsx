@@ -51,7 +51,7 @@ export default async function BookingsPage() {
         : { bookings: [], requests: [] };
 
     return (
-        <div className="grid grid-cols-1 grid-rows-1 min-h-[calc(100vh-200px)]">
+        <div className="max-w-6xl mx-auto w-full grid grid-cols-1 grid-rows-1 min-h-[calc(100vh-200px)]">
             {/* Unauthenticated Overlay */}
             {!isAuthenticated && (
                 <div className="col-start-1 row-start-1 z-40 relative pointer-events-none">
@@ -93,7 +93,7 @@ export default async function BookingsPage() {
                 </div>
             )}
 
-            <div className={`col-start-1 row-start-1 max-w-6xl mx-auto py-12 px-6 space-y-16 transition-all duration-700 ${!isAuthenticated ? 'blur-[1px] grayscale-[0.5]' : ''}`}>
+            <div className={`col-start-1 row-start-1 py-12 px-6 space-y-16 transition-all duration-700 ${!isAuthenticated ? 'blur-[1px] grayscale-[0.5]' : ''}`}>
                 <section className="space-y-8">
                     <div className="space-y-2">
                         <h1 className="text-5xl md:text-7xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none tracking-tighter">
