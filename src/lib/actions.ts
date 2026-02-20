@@ -273,19 +273,21 @@ export async function createArtist(formData: FormData) {
     const bio = formData.get("bio") as string;
     const chapters = formData.getAll("chapters") as string[];
     const selectedMembers = formData.getAll("members") as string[];
+    const image = formData.get("image") as string;
+    const imagePreference = formData.get("image_preference") as string || 'custom';
 
     const db = await getDB();
     const id = crypto.randomUUID();
 
-    // Use user image for the artist if solo
-    const userImage = user.image;
+    // Use provided image or fallback to user image for the artist if solo
+    const finalImage = image || user.image;
 
     // Ensure owner is always a member
     const allMembers = Array.from(new Set([user.id, ...selectedMembers]));
 
     await db.prepare(
         "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?)"
-    ).bind(id, name, location, bio, userImage, user.id, JSON.stringify(allMembers), JSON.stringify(chapters), 'google').run();
+    ).bind(id, name, location, bio, finalImage, user.id, JSON.stringify(allMembers), JSON.stringify(chapters), imagePreference).run();
 
     await createUnifiedRequest("ARTIST_ADD", id, {
         name,
@@ -293,7 +295,8 @@ export async function createArtist(formData: FormData) {
         bio,
         chapters,
         members: allMembers,
-        image_preference: 'google'
+        image: finalImage,
+        image_preference: imagePreference
     });
 
     revalidatePath("/directories");
@@ -416,6 +419,8 @@ export async function createBooking(formData: FormData) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
     const questions = formData.get("questions") as string;
+    const image = formData.get("image") as string;
+    const imagePreference = formData.get("image_preference") as string || 'custom';
 
     // Dates data is sent as arrays from the dynamic form
     const dates = formData.getAll("dates[]") as string[];
@@ -431,9 +436,9 @@ export async function createBooking(formData: FormData) {
 
     const statements = [
         db.prepare(`
-            INSERT INTO bookings (id, name, email, phone, questions, created_by, status, image_preference) 
-            VALUES (?, ?, ?, ?, ?, ?, 'PENDING', 'google')
-        `).bind(bookingId, name, email, phone, questions, session.user.id)
+            INSERT INTO bookings (id, name, email, phone, questions, created_by, status, image, image_preference) 
+            VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
+        `).bind(bookingId, name, email, phone, questions, session.user.id, image || null, imagePreference)
     ];
 
     for (let i = 0; i < dates.length; i++) {
@@ -457,7 +462,11 @@ export async function createBooking(formData: FormData) {
 
     await db.batch(statements);
 
-    await createUnifiedRequest("BOOKING_INQUIRY", bookingId, { name, email, phone, image_preference: 'google' });
+    await createUnifiedRequest("BOOKING_INQUIRY", bookingId, {
+        name, email, phone,
+        image: image || null,
+        image_preference: imagePreference
+    });
 
     revalidatePath("/bookings");
     revalidatePath("/admin");
