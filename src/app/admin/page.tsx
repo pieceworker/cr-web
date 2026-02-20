@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import Link from "next/link";
 import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -46,12 +47,22 @@ async function getAdminData() {
 
     const users = await db.prepare("SELECT * FROM users").all();
 
+    // Fetch all unique images from artists and bookings that are stored in R2
+    const artistImages = await db.prepare("SELECT id, name, image FROM artists WHERE image LIKE '/api/image/%'").all();
+    const bookingImages = await db.prepare("SELECT id, name, image FROM bookings WHERE image LIKE '/api/image/%'").all();
+
+    const uploadedImages = [
+        ...(artistImages.results as { id: string, name: string, image: string }[]).map(img => ({ ...img, type: 'artist' })),
+        ...(bookingImages.results as { id: string, name: string, image: string }[]).map(img => ({ ...img, type: 'booking' }))
+    ];
+
     return {
         requests: (requestsRes.results as unknown as UnifiedRequest[] || []),
         chapters: (chapters.results as unknown as Chapter[] || []),
         artists: (artists.results as unknown as Artist[] || []),
         bookings: bookingsWithDates,
-        users: (users.results as unknown as User[] || [])
+        users: (users.results as unknown as User[] || []),
+        uploadedImages
     };
 }
 
@@ -67,7 +78,7 @@ export default async function AdminPage() {
     const session = await auth();
     if (!isAdmin(session?.user?.email)) redirect("/");
 
-    const { requests, chapters, artists, bookings, users } = await getAdminData();
+    const { requests, chapters, artists, bookings, users, uploadedImages } = await getAdminData();
 
     return (
         <div className="max-w-6xl mx-auto py-12 px-6 space-y-24">
@@ -171,6 +182,32 @@ export default async function AdminPage() {
                 <div className="grid gap-8 mt-6">
                     {bookings.map((b) => <BookingCard key={b.id} b={b} requests={requests} isAdmin={true} />)}
                     {bookings.length === 0 && <p className="text-zinc-500 italic py-12 text-center uppercase tracking-widest text-sm border-2 border-dashed border-zinc-200 dark:border-zinc-800">No booking inquiries found.</p>}
+                </div>
+            </section>
+
+            {/* Uploaded Images */}
+            <section>
+                <h2 className={SECTION_HEADER}>Uploaded Images ({uploadedImages.length})</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-6">
+                    {uploadedImages.map((img) => (
+                        <Link
+                            key={img.image}
+                            href={img.type === 'artist' ? `/artists/${img.id}` : `/bookings/${img.id}`}
+                            className="group block bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-2 hover:border-red-600 transition-all shadow-sm"
+                        >
+                            <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden">
+                                <Image src={img.image} alt={img.name} fill className="object-cover" unoptimized />
+                            </div>
+                            <div className="mt-2 text-[8px] font-black uppercase tracking-tighter truncate text-zinc-500 group-hover:text-red-600">
+                                {img.name}
+                            </div>
+                        </Link>
+                    ))}
+                    {uploadedImages.length === 0 && (
+                        <div className="col-span-full py-12 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-800">
+                            <p className="text-zinc-500 italic uppercase tracking-widest text-sm">No R2-stored images found.</p>
+                        </div>
+                    )}
                 </div>
             </section>
         </div>
