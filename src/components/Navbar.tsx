@@ -48,27 +48,13 @@ export default async function Navbar() {
         </Link>
       </div>
 
-      <div className="flex items-center gap-4 md:gap-8 overflow-hidden">
-        {/* Desktop Links - hidden on small screens */}
-        <ul className="hidden lg:flex items-center gap-6 text-[10px] md:text-xs font-bold uppercase tracking-widest whitespace-nowrap overflow-x-auto no-scrollbar">
-          {navItems.map((item) => (
-            <li key={item.path} className="shrink-0">
-              <Link href={item.path} className="text-zinc-600 dark:text-zinc-400 hover:text-red-600 transition-colors">
-                {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* User Status / Dropdown Trigger */}
-        <div className="shrink-0 ml-auto">
-          <NavUserMenu
-            session={session}
-            navItems={navItems}
-            signInAction={handleSignIn}
-            signOutAction={handleSignOut}
-          />
-        </div>
+      <div className="shrink-0 ml-auto">
+        <NavUserMenu
+          session={session}
+          navItems={navItems}
+          signInAction={handleSignIn}
+          signOutAction={handleSignOut}
+        />
       </div>
     </nav>
   );
