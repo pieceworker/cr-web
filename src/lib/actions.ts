@@ -150,13 +150,13 @@ export async function approveUnifiedRequest(requestId: string) {
     }
     else if (request.type === 'ARTIST_EDIT') {
         statements.push(db.prepare(
-            "UPDATE artists SET name = ?, location = ?, bio = ?, image = ?, chapters = ?, members = ?, status = 'APPROVED' WHERE id = ?"
-        ).bind(data.name, data.location, data.bio, data.image, JSON.stringify(data.chapters), JSON.stringify(data.members), request.target_id));
+            "UPDATE artists SET name = ?, location = ?, bio = ?, image = ?, chapters = ?, members = ?, status = 'APPROVED', image_preference = ? WHERE id = ?"
+        ).bind(data.name, data.location, data.bio, data.image, JSON.stringify(data.chapters), JSON.stringify(data.members), data.image_preference || 'custom', request.target_id));
     } else if (request.type === 'ARTIST_ADD') {
         statements.push(db.prepare("UPDATE artists SET status = 'APPROVED' WHERE id = ?").bind(request.target_id));
     } else if (request.type === 'BOOKING_EDIT') {
-        statements.push(db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED' WHERE id = ?").bind(
-            data.name, data.email, data.phone, data.questions, request.target_id
+        statements.push(db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ? WHERE id = ?").bind(
+            data.name, data.email, data.phone, data.questions, data.image_preference || 'custom', request.target_id
         ));
         statements.push(db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(request.target_id));
 
@@ -284,15 +284,16 @@ export async function createArtist(formData: FormData) {
     const allMembers = Array.from(new Set([user.id, ...selectedMembers]));
 
     await db.prepare(
-        "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters) VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)"
-    ).bind(id, name, location, bio, userImage, user.id, JSON.stringify(allMembers), JSON.stringify(chapters)).run();
+        "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, ?)"
+    ).bind(id, name, location, bio, userImage, user.id, JSON.stringify(allMembers), JSON.stringify(chapters), 'google').run();
 
     await createUnifiedRequest("ARTIST_ADD", id, {
         name,
         location,
         bio,
         chapters,
-        members: allMembers
+        members: allMembers,
+        image_preference: 'google'
     });
 
     revalidatePath("/directories");
@@ -339,6 +340,7 @@ export async function updateArtist(formData: FormData) {
     const image = formData.get("image") as string;
     const chapters = formData.getAll("chapters") as string[];
     const members = formData.getAll("members") as string[];
+    const imagePreference = formData.get("image_preference") as string || 'custom';
 
     const db = await getDB();
     const artist = await db.prepare("SELECT owner_id, members FROM artists WHERE id = ?").bind(id).first() as Artist | null;
@@ -355,8 +357,8 @@ export async function updateArtist(formData: FormData) {
     if (isAdmin(session?.user?.email) && isAdminAction) {
         const statements = [
             db.prepare(
-                "UPDATE artists SET name = ?, location = ?, bio = ?, image = ?, chapters = ?, members = ?, status = 'APPROVED' WHERE id = ?"
-            ).bind(name, location, bio, image, JSON.stringify(chapters), JSON.stringify(members), id)
+                "UPDATE artists SET name = ?, location = ?, bio = ?, image = ?, chapters = ?, members = ?, status = 'APPROVED', image_preference = ? WHERE id = ?"
+            ).bind(name, location, bio, image, JSON.stringify(chapters), JSON.stringify(members), imagePreference, id)
         ];
 
         if (reviewRequestId) {
@@ -365,7 +367,7 @@ export async function updateArtist(formData: FormData) {
 
         await db.batch(statements);
     } else {
-        await createUnifiedRequest("ARTIST_EDIT", id, { name, location, bio, image, chapters, members });
+        await createUnifiedRequest("ARTIST_EDIT", id, { name, location, bio, image, chapters, members, image_preference: imagePreference });
     }
 
     revalidatePath("/admin");
@@ -429,8 +431,8 @@ export async function createBooking(formData: FormData) {
 
     const statements = [
         db.prepare(`
-            INSERT INTO bookings (id, name, email, phone, questions, created_by, status) 
-            VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
+            INSERT INTO bookings (id, name, email, phone, questions, created_by, status, image_preference) 
+            VALUES (?, ?, ?, ?, ?, ?, 'PENDING', 'google')
         `).bind(bookingId, name, email, phone, questions, session.user.id)
     ];
 
@@ -455,7 +457,7 @@ export async function createBooking(formData: FormData) {
 
     await db.batch(statements);
 
-    await createUnifiedRequest("BOOKING_INQUIRY", bookingId, { name, email, phone });
+    await createUnifiedRequest("BOOKING_INQUIRY", bookingId, { name, email, phone, image_preference: 'google' });
 
     revalidatePath("/bookings");
     revalidatePath("/admin");
@@ -691,6 +693,7 @@ export async function updateBooking(formData: FormData) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
     const questions = formData.get("questions") as string;
+    const imagePreference = formData.get("image_preference") as string || 'custom';
     const isAdminAction = formData.get("isAdminAction") === "true";
 
     const dates = formData.getAll("dates[]") as string[];
@@ -712,8 +715,8 @@ export async function updateBooking(formData: FormData) {
     if (isAdmin(session?.user?.email) && isAdminAction) {
         const reviewRequestId = formData.get("reviewRequestId") as string | null;
         const statements = [
-            db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED' WHERE id = ?").bind(
-                name, email, phone, questions, id
+            db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ? WHERE id = ?").bind(
+                name, email, phone, questions, imagePreference, id
             ),
             db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(id)
         ];
@@ -744,7 +747,7 @@ export async function updateBooking(formData: FormData) {
         await db.batch(statements);
     } else {
         await createUnifiedRequest("BOOKING_EDIT", id, {
-            name, email, phone, questions,
+            name, email, phone, questions, image_preference: imagePreference,
             dates, times, durations, eventTypes, locations, descriptions, budgets
         });
     }

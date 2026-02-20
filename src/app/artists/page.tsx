@@ -72,7 +72,11 @@ export default async function ArtistsPage() {
                     {artists.length > 0 ? artists.map((a) => (
                         <Link href={`/artists/${a.id}`} key={a.id} className="group cursor-pointer block border border-zinc-200 dark:border-zinc-800 p-4 hover:border-red-600 transition-all">
                             <div className="aspect-square bg-zinc-100 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 mb-6 overflow-hidden relative">
-                                {a.image && <Image src={a.image} alt={a.name} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
+                                {(() => {
+                                    const owner = availableMusicians.find(u => u.id === a.owner_id);
+                                    const displayImage = a.image_preference === 'google' ? owner?.image : a.image;
+                                    return displayImage ? <Image src={displayImage} alt={a.name} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized /> : null;
+                                })()}
                             </div>
                             <h3 className="font-black text-2xl uppercase tracking-tighter font-heading mb-1">{a.name}</h3>
                             <p className="text-red-600 text-xs font-black uppercase tracking-widest">{a.location}</p>

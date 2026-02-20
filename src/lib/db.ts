@@ -31,6 +31,7 @@ export interface Artist {
     members: string | null; // JSON array of names
     status: "PENDING" | "APPROVED";
     chapters: string | null; // JSON array of chapter IDs
+    image_preference: 'custom' | 'google';
 }
 
 export interface Booking {
@@ -42,6 +43,7 @@ export interface Booking {
     image: string | null;
     created_by: string;
     status: "PENDING" | "APPROVED";
+    image_preference: 'custom' | 'google';
 }
 
 export interface BookingDate {

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Chapter } from "@/lib/db";
 import { updateChapter } from "@/lib/actions";
+import Image from "next/image";
 
 interface ChapterEditFormProps {
     chapter: Chapter;
@@ -13,6 +14,7 @@ export default function ChapterEditForm({ chapter }: ChapterEditFormProps) {
     const [bio, setBio] = useState(chapter.bio || "");
     const image = chapter.image || "";
     const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
 
     const isDirty = useMemo(() => {
@@ -23,6 +25,7 @@ export default function ChapterEditForm({ chapter }: ChapterEditFormProps) {
     }, [location, bio, image, file, chapter]);
 
     const INPUT = "w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm";
+    const LABEL = "block text-[10px] font-bold uppercase text-zinc-400 mb-1 tracking-widest";
     const BUTTON_PRIMARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-6 hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all text-xs tracking-widest disabled:opacity-50 disabled:cursor-not-allowed";
 
     const handleSubmit = async (formData: FormData) => {
@@ -77,6 +80,25 @@ export default function ChapterEditForm({ chapter }: ChapterEditFormProps) {
                 onChange={(e) => setBio(e.target.value)}
                 className={`${INPUT} h-20`}
             />
+            <div className="grid grid-cols-2 gap-4">
+                {image && (
+                    <div className="space-y-1">
+                        <p className={LABEL}>Current Image</p>
+                        <div className="aspect-video relative border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 overflow-hidden grayscale-[0.5]">
+                            <Image src={image} alt="Current" fill className="object-cover" unoptimized />
+                        </div>
+                    </div>
+                )}
+                {previewUrl && (
+                    <div className="space-y-1">
+                        <p className={`${LABEL} text-green-600`}>New Image Preview</p>
+                        <div className="aspect-video relative border-2 border-green-500 bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
+                            <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+                        </div>
+                    </div>
+                )}
+            </div>
+
             <input
                 type="file"
                 accept="image/*"
@@ -84,12 +106,11 @@ export default function ChapterEditForm({ chapter }: ChapterEditFormProps) {
                     const selected = e.target.files?.[0];
                     if (selected) {
                         setFile(selected);
+                        setPreviewUrl(URL.createObjectURL(selected));
                     }
                 }}
                 className={INPUT}
             />
-            {image && !file && <p className="text-[10px] text-zinc-500 italic">Current image: {image}</p>}
-            {file && <p className="text-[10px] text-green-600 italic">New image selected: {file.name}</p>}
             <button
                 className={`${BUTTON_PRIMARY} w-full`}
                 disabled={!isDirty || isUploading}

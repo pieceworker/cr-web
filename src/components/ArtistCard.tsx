@@ -42,10 +42,14 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
     // For users, show the original artist data if pending to avoid "determining the outcome"
     const displayArtist = (isAdmin || !isPending) ? mergedArtist : a;
 
+    // Determine which image to show based on preference
+    const owner = users.find(u => u.id === displayArtist.owner_id);
+    const displayImage = displayArtist.image_preference === 'google' ? owner?.image : displayArtist.image;
+
     return (
         <div className={`bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 flex flex-col md:flex-row gap-8 items-start transition-all ${isPending && !isAdmin ? 'opacity-75 grayscale-[0.2]' : ''}`}>
             <div className="w-32 h-32 bg-zinc-200 dark:bg-zinc-800 border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
-                {displayArtist.image && <Image src={displayArtist.image} alt={displayArtist.name} fill className="object-cover" unoptimized />}
+                {displayImage && <Image src={displayImage} alt={displayArtist.name} fill className="object-cover" unoptimized />}
             </div>
             <div className="flex-1 space-y-2 w-full">
                 <div className="flex justify-between items-start">

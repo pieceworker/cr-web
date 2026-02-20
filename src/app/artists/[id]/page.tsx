@@ -37,7 +37,11 @@ export default async function ArtistProfilePage({ params }: { params: Promise<{ 
                 {/* Artist Image / Member Rings */}
                 <div className="relative group">
                     <div className="w-64 h-64 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden shrink-0 relative shadow-2xl">
-                        {artist.image && <Image src={artist.image} alt={artist.name} fill className="object-cover transition-all duration-500" unoptimized />}
+                        {(() => {
+                            const owner = members.find(m => m.id === artist.owner_id);
+                            const displayImage = artist.image_preference === 'google' ? owner?.image : artist.image;
+                            return displayImage ? <Image src={displayImage} alt={artist.name} fill className="object-cover transition-all duration-500" unoptimized /> : null;
+                        })()}
                     </div>
                     {/* Member Profile Rings Overlay */}
                     <div className="absolute -bottom-6 -right-6 flex -space-x-4">

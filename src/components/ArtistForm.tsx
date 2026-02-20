@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Artist, Chapter, User, UnifiedRequest } from "@/lib/db";
 import { createArtist, updateArtist } from "@/lib/actions";
+import Image from "next/image";
 
 interface ArtistFormProps {
     artist?: Artist; // Optional for creation
@@ -50,7 +51,9 @@ export default function ArtistForm({
     const [name, setName] = useState(pendingData?.name ?? artist?.name ?? "");
     const [location, setLocation] = useState(pendingData?.location ?? artist?.location ?? "");
     const [bio, setBio] = useState(pendingData?.bio ?? artist?.bio ?? "");
+    const [imagePreference, setImagePreference] = useState<'custom' | 'google'>(pendingData?.image_preference ?? artist?.image_preference ?? 'custom');
     const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -74,6 +77,7 @@ export default function ArtistForm({
             bio !== (pendingData?.bio ?? artist?.bio ?? "") ||
             chaptersChanged ||
             membersChanged ||
+            imagePreference !== (pendingData?.image_preference ?? artist?.image_preference ?? "custom") ||
             file !== null;
     }, [name, location, bio, selectedChapters, selectedMembers, file, artist, pendingData, currentUserId]);
 
@@ -96,6 +100,8 @@ export default function ArtistForm({
             onSubmit={handleSubmit}
             action={async (formData) => {
                 let finalImageUrl = pendingData?.image ?? artist?.image ?? "";
+
+                formData.set("image_preference", imagePreference);
 
                 if (file) {
                     setIsUploading(true);
@@ -251,15 +257,88 @@ export default function ArtistForm({
                 </div>
 
                 <div>
-                    <label className={LABEL}>Profile Image (Optional)</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        className={INPUT}
-                    />
-                    {(artist?.image || pendingData?.image) && !file && <p className="text-[10px] text-zinc-500 italic mt-2">Currently has an image.</p>}
-                    {file && <p className="text-[10px] text-green-600 italic mt-2">New image selected: {file.name}</p>}
+                    <label className={LABEL}>Profile Image</label>
+                    <div className="space-y-4 bg-zinc-50 dark:bg-zinc-900 p-4 border border-zinc-200 dark:border-zinc-800">
+                        <div className="flex gap-6">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="radio"
+                                    name="image_preference_ui"
+                                    value="custom"
+                                    checked={imagePreference === 'custom'}
+                                    onChange={() => setImagePreference('custom')}
+                                    className="accent-red-600"
+                                />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100">Custom Upload</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="radio"
+                                    name="image_preference_ui"
+                                    value="google"
+                                    checked={imagePreference === 'google'}
+                                    onChange={() => setImagePreference('google')}
+                                    className="accent-red-600"
+                                />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100">Google Photo</span>
+                            </label>
+                        </div>
+
+                        {imagePreference === 'custom' && (
+                            <div className="space-y-4 pt-2">
+                                <div className="grid grid-cols-2 gap-4">
+                                    {(artist?.image || pendingData?.image) && (
+                                        <div className="space-y-1">
+                                            <p className={LABEL}>Current Custom Image</p>
+                                            <div className="aspect-square w-32 relative border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 overflow-hidden grayscale-[0.5]">
+                                                <Image src={(pendingData?.image ?? artist?.image)!} alt="Current" fill className="object-cover" unoptimized />
+                                            </div>
+                                        </div>
+                                    )}
+                                    {previewUrl && (
+                                        <div className="space-y-1">
+                                            <p className={`${LABEL} text-green-600`}>New Preview</p>
+                                            <div className="aspect-square w-32 relative border-2 border-green-500 bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
+                                                <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const selected = e.target.files?.[0] || null;
+                                        setFile(selected);
+                                        if (selected) {
+                                            setPreviewUrl(URL.createObjectURL(selected));
+                                        }
+                                    }}
+                                    className={INPUT}
+                                />
+                            </div>
+                        )}
+
+                        {imagePreference === 'google' && (
+                            <div className="pt-2 space-y-2">
+                                <p className={LABEL}>Google Profile Photo</p>
+                                <div className="aspect-square w-32 relative border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 overflow-hidden rounded-full">
+                                    {availableMusicians.find(u => u.id === (artist?.owner_id || currentUserId))?.image ? (
+                                        <Image
+                                            src={availableMusicians.find(u => u.id === (artist?.owner_id || currentUserId))!.image!}
+                                            alt="Google Photo"
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-zinc-400 text-[10px] font-bold uppercase">No Photo</div>
+                                    )}
+                                </div>
+                                <p className="text-[10px] text-zinc-500 italic">Using your default photo from Google Login.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">

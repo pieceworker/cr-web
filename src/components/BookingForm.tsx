@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { createBooking, updateBooking } from "@/lib/actions";
 import { Booking, BookingDate, UnifiedRequest } from "@/lib/db";
+import Image from "next/image";
 
 interface BookingFormProps {
     disabled?: boolean;
@@ -71,7 +72,9 @@ export default function BookingForm({
     const [email, setEmail] = useState(pendingData?.email ?? booking?.email ?? initialUserData?.email ?? '');
     const [phone, setPhone] = useState(pendingData?.phone ?? booking?.phone ?? '');
     const [questions, setQuestions] = useState(pendingData?.questions ?? booking?.questions ?? '');
+    const [imagePreference, setImagePreference] = useState<'custom' | 'google'>(pendingData?.image_preference ?? booking?.image_preference ?? 'custom');
     const [file, setFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
 
     const initialDates = useMemo(() => {
@@ -110,6 +113,7 @@ export default function BookingForm({
             phone !== (pendingData?.phone ?? booking?.phone ?? '') ||
             questions !== (pendingData?.questions ?? booking?.questions ?? '') ||
             datesChanged ||
+            imagePreference !== (pendingData?.image_preference ?? booking?.image_preference ?? 'custom') ||
             file !== null;
     }, [name, email, phone, questions, dates, initialDates, file, pendingData, booking, initialUserData]);
 
@@ -133,6 +137,8 @@ export default function BookingForm({
         <form
             action={async (formData) => {
                 let finalImageUrl = pendingData?.image ?? booking?.image ?? "";
+
+                formData.set("image_preference", imagePreference);
 
                 if (file) {
                     setIsUploading(true);
@@ -308,15 +314,89 @@ export default function BookingForm({
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Custom Image (Optional)</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                            className="w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors disabled:opacity-50 text-sm"
-                        />
-                        {(booking?.image || pendingData?.image) && !file && <p className="text-[10px] text-zinc-500 italic mt-2">Currently has a custom image.</p>}
-                        {file && <p className="text-[10px] text-green-600 italic mt-2">New image selected: {file.name}</p>}
+                        <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Display Image</label>
+                        <div className="space-y-4 bg-white dark:bg-black p-6 border border-zinc-200 dark:border-zinc-800">
+                            <div className="flex gap-6">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input
+                                        type="radio"
+                                        name="image_preference_ui"
+                                        value="custom"
+                                        checked={imagePreference === 'custom'}
+                                        onChange={() => setImagePreference('custom')}
+                                        className="accent-red-600"
+                                    />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100">Custom Upload</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <input
+                                        type="radio"
+                                        name="image_preference_ui"
+                                        value="google"
+                                        checked={imagePreference === 'google'}
+                                        onChange={() => setImagePreference('google')}
+                                        className="accent-red-600"
+                                    />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100">Google Photo</span>
+                                </label>
+                            </div>
+
+                            {imagePreference === 'custom' && (
+                                <div className="space-y-4 pt-2">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {(booking?.image || pendingData?.image) && (
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">Current Custom Image</p>
+                                                <div className="aspect-square w-24 relative border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 overflow-hidden grayscale-[0.5]">
+                                                    <Image src={(pendingData?.image ?? booking?.image)!} alt="Current" fill className="object-cover" unoptimized />
+                                                </div>
+                                            </div>
+                                        )}
+                                        {previewUrl && (
+                                            <div className="space-y-1">
+                                                <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest text-green-600">New Preview</p>
+                                                <div className="aspect-square w-24 relative border-2 border-green-500 bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
+                                                    <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const selected = e.target.files?.[0] || null;
+                                            setFile(selected);
+                                            if (selected) {
+                                                setPreviewUrl(URL.createObjectURL(selected));
+                                            }
+                                        }}
+                                        className="w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm"
+                                    />
+                                </div>
+                            )}
+
+                            {imagePreference === 'google' && (
+                                <div className="pt-2 space-y-2">
+                                    <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">Google Profile Photo</p>
+                                    <div className="w-24 h-24 rounded-full border-2 border-red-600 overflow-hidden relative">
+                                        {/* Since we don't always have initialUserData here, we might need to show a placeholder or fetch it */}
+                                        {(booking as any)?.user_image || (booking as any)?.user?.image ? (
+                                            <Image
+                                                src={(booking as any)?.user_image || (booking as any)?.user?.image}
+                                                alt="Google Photo"
+                                                fill
+                                                className="object-cover"
+                                                unoptimized
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400 text-[10px] font-bold uppercase">No Photo</div>
+                                        )}
+                                    </div>
+                                    <p className="text-[10px] text-zinc-500 italic">Using your default photo from Google Login.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
