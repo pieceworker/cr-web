@@ -2,12 +2,13 @@ import { auth } from "@/auth";
 import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { createChapter, deleteChapter } from "@/lib/actions";
+import { deleteChapter } from "@/lib/actions";
 import Image from "next/image";
 import ChapterEditForm from "@/components/ChapterEditForm";
 import UserCard from "@/components/UserCard";
 import ArtistCard from "@/components/ArtistCard";
 import BookingCard from "@/components/BookingCard";
+import NewChapterForm from "@/components/NewChapterForm";
 
 export const dynamic = "force-dynamic";
 
@@ -56,9 +57,7 @@ async function getAdminData() {
 
 // Reusable Tailwind classes for consistency
 const SECTION_HEADER = "text-2xl font-black uppercase italic tracking-tighter border-b-4 border-red-600 inline-block font-heading mb-6";
-const BUTTON_PRIMARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-6 hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all text-xs tracking-widest";
 const BUTTON_DANGER = "text-red-600 font-bold hover:underline text-xs uppercase tracking-widest";
-const INPUT = "w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm";
 const SUMMARY = "cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open:bg-red-600 group-open:text-white group-open:hover:text-white transition-all";
 
 
@@ -150,12 +149,7 @@ export default async function AdminPage() {
                             </summary>
                             <div className="text-left w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
                                 <h3 className="font-black text-xl uppercase italic font-heading tracking-tighter mb-4 text-center">New Chapter</h3>
-                                <form action={createChapter} className="space-y-4">
-                                    <input name="location" required placeholder="Location" className={INPUT} />
-                                    <textarea name="bio" required placeholder="Description..." className={`${INPUT} h-24`} />
-                                    <input name="image" required placeholder="Image URL" className={INPUT} />
-                                    <button className={`${BUTTON_PRIMARY} w-full`}>Create Chapter</button>
-                                </form>
+                                <NewChapterForm />
                             </div>
                         </details>
                     </div>

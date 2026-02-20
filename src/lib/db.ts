@@ -39,6 +39,7 @@ export interface Booking {
     email: string;
     phone: string;
     questions: string | null;
+    image: string | null;
     created_by: string;
     status: "PENDING" | "APPROVED";
 }

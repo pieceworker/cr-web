@@ -50,6 +50,8 @@ export default function ArtistForm({
     const [name, setName] = useState(pendingData?.name ?? artist?.name ?? "");
     const [location, setLocation] = useState(pendingData?.location ?? artist?.location ?? "");
     const [bio, setBio] = useState(pendingData?.bio ?? artist?.bio ?? "");
+    const [file, setFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const isDirty = useMemo(() => {
@@ -71,8 +73,9 @@ export default function ArtistForm({
             location !== (pendingData?.location ?? artist?.location ?? "") ||
             bio !== (pendingData?.bio ?? artist?.bio ?? "") ||
             chaptersChanged ||
-            membersChanged;
-    }, [name, location, bio, selectedChapters, selectedMembers, artist, pendingData, currentUserId]);
+            membersChanged ||
+            file !== null;
+    }, [name, location, bio, selectedChapters, selectedMembers, file, artist, pendingData, currentUserId]);
 
     const INPUT = "w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm disabled:bg-zinc-100 dark:disabled:bg-zinc-900 disabled:text-zinc-500";
     const LABEL = "block text-[10px] font-bold uppercase text-zinc-400 mb-1 tracking-widest";
@@ -92,6 +95,41 @@ export default function ArtistForm({
         <form
             onSubmit={handleSubmit}
             action={async (formData) => {
+                let finalImageUrl = pendingData?.image ?? artist?.image ?? "";
+
+                if (file) {
+                    setIsUploading(true);
+                    const uploadData = new FormData();
+                    uploadData.append("file", file);
+
+                    try {
+                        const res = await fetch("/api/upload", {
+                            method: "POST",
+                            body: uploadData,
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json() as { url: string };
+                            finalImageUrl = data.url;
+                        } else {
+                            setError("Image upload failed");
+                            setIsUploading(false);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("Upload failed", e);
+                        setError("Image upload failed");
+                        setIsUploading(false);
+                        return;
+                    } finally {
+                        setIsUploading(false);
+                    }
+                }
+
+                if (finalImageUrl) {
+                    formData.set("image", finalImageUrl);
+                }
+
                 if (customAction) {
                     await customAction(formData);
                 } else if (isEdit) {
@@ -105,7 +143,6 @@ export default function ArtistForm({
         >
             {artist && <input type="hidden" name="id" value={artist.id} />}
             {reviewRequestId && <input type="hidden" name="reviewRequestId" value={reviewRequestId} />}
-            {artist?.image && <input type="hidden" name="image" value={artist.image} />}
             {isAdmin && <input type="hidden" name="isAdminAction" value="true" />}
 
             {error && (
@@ -213,6 +250,18 @@ export default function ArtistForm({
                     />
                 </div>
 
+                <div>
+                    <label className={LABEL}>Profile Image (Optional)</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        className={INPUT}
+                    />
+                    {(artist?.image || pendingData?.image) && !file && <p className="text-[10px] text-zinc-500 italic mt-2">Currently has an image.</p>}
+                    {file && <p className="text-[10px] text-green-600 italic mt-2">New image selected: {file.name}</p>}
+                </div>
+
                 <div className="flex flex-col sm:flex-row gap-4">
                     <button
                         type="submit"
@@ -222,9 +271,9 @@ export default function ArtistForm({
                                 ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
                                 : "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]"
                             }`}
-                        disabled={(!isDirty && !reviewRequestId) || (isPending && !isAdmin && !reviewRequestId)}
+                        disabled={(!isDirty && !reviewRequestId) || (isPending && !isAdmin && !reviewRequestId) || isUploading}
                     >
-                        {reviewRequestId ? "Approve & Save Changes" : (isAdmin ? (isEdit ? "Save Artist Changes" : "Create Artist") : (isPending ? "Request Pending" : (isEdit ? "Request Profile Update" : "Create Artist")))}
+                        {isUploading ? "Uploading..." : (reviewRequestId ? "Approve & Save Changes" : (isAdmin ? (isEdit ? "Save Artist Changes" : "Create Artist") : (isPending ? "Request Pending" : (isEdit ? "Request Profile Update" : "Create Artist"))))}
                     </button>
                     {reviewRequestId && (
                         <button

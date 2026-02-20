@@ -9,7 +9,7 @@ import BookingForm from "@/components/BookingForm";
 const BUTTON_SECONDARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-6 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all text-xs tracking-widest active:scale-[0.98]";
 
 interface BookingCardProps {
-    b: Booking & { user_name: string; user_image?: string, dates: BookingDate[] };
+    b: Booking & { user_name: string; user_image?: string, image?: string | null, dates: BookingDate[] };
     requests: UnifiedRequest[];
     isAdmin?: boolean;
 }
@@ -27,7 +27,7 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
             <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
                 <div className="flex gap-6 items-start">
                     <div className="w-16 h-16 rounded-full border-2 border-red-600 overflow-hidden relative grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500 shrink-0">
-                        {b.user_image && <Image src={b.user_image} alt={b.user_name || 'User'} fill className="object-cover" unoptimized />}
+                        {(b.image || b.user_image) && <Image src={b.image || b.user_image!} alt={b.user_name || 'User'} fill className="object-cover" unoptimized />}
                     </div>
                     <div className="space-y-1">
                         <div className="flex items-center gap-3">

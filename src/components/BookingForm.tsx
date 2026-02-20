@@ -71,6 +71,8 @@ export default function BookingForm({
     const [email, setEmail] = useState(pendingData?.email ?? booking?.email ?? initialUserData?.email ?? '');
     const [phone, setPhone] = useState(pendingData?.phone ?? booking?.phone ?? '');
     const [questions, setQuestions] = useState(pendingData?.questions ?? booking?.questions ?? '');
+    const [file, setFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     const initialDates = useMemo(() => {
         if (pendingData?.dates) {
@@ -107,8 +109,9 @@ export default function BookingForm({
             email !== (pendingData?.email ?? booking?.email ?? initialUserData?.email ?? '') ||
             phone !== (pendingData?.phone ?? booking?.phone ?? '') ||
             questions !== (pendingData?.questions ?? booking?.questions ?? '') ||
-            datesChanged;
-    }, [name, email, phone, questions, dates, initialDates, pendingData, booking, initialUserData]);
+            datesChanged ||
+            file !== null;
+    }, [name, email, phone, questions, dates, initialDates, file, pendingData, booking, initialUserData]);
 
     const addDate = () => {
         if (dates.length < 100 && !disabled) {
@@ -129,6 +132,41 @@ export default function BookingForm({
     return (
         <form
             action={async (formData) => {
+                let finalImageUrl = pendingData?.image ?? booking?.image ?? "";
+
+                if (file) {
+                    setIsUploading(true);
+                    const uploadData = new FormData();
+                    uploadData.append("file", file);
+
+                    try {
+                        const res = await fetch("/api/upload", {
+                            method: "POST",
+                            body: uploadData,
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json() as { url: string };
+                            finalImageUrl = data.url;
+                        } else {
+                            alert("Image upload failed");
+                            setIsUploading(false);
+                            return;
+                        }
+                    } catch (e) {
+                        console.error("Upload failed", e);
+                        alert("Image upload failed");
+                        setIsUploading(false);
+                        return;
+                    } finally {
+                        setIsUploading(false);
+                    }
+                }
+
+                if (finalImageUrl) {
+                    formData.set("image", finalImageUrl);
+                }
+
                 if (isEdit) {
                     await updateBooking(formData);
                 } else {
@@ -269,18 +307,30 @@ export default function BookingForm({
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Custom Image (Optional)</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                            className="w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors disabled:opacity-50 text-sm"
+                        />
+                        {(booking?.image || pendingData?.image) && !file && <p className="text-[10px] text-zinc-500 italic mt-2">Currently has a custom image.</p>}
+                        {file && <p className="text-[10px] text-green-600 italic mt-2">New image selected: {file.name}</p>}
+                    </div>
+
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button
                             type="submit"
                             className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest shadow-lg ${(disabled || (isPending && !isAdmin)) && !reviewRequestId
                                 ? "bg-zinc-200 text-zinc-400 cursor-not-allowed shadow-none"
-                                : (!isDirty && !reviewRequestId)
+                                : (!isDirty && !reviewRequestId) || isUploading
                                     ? "bg-zinc-200 text-zinc-400 cursor-not-allowed shadow-none"
                                     : "bg-red-600 text-white hover:bg-red-700 shadow-red-600/20 active:scale-[0.99]"
                                 }`}
-                            disabled={(!isDirty && !reviewRequestId) || ((disabled || (isPending && !isAdmin)) && !reviewRequestId)}
+                            disabled={(!isDirty && !reviewRequestId) || ((disabled || (isPending && !isAdmin)) && !reviewRequestId) || isUploading}
                         >
-                            {reviewRequestId && isAdmin ? "Approve & Save Changes" : (isAdmin ? "Save Booking" : (isPending ? "Request Pending" : (isEdit ? "Request Booking Update" : "Submit Booking Inquiry")))}
+                            {isUploading ? "Uploading..." : (reviewRequestId && isAdmin ? "Approve & Save Changes" : (isAdmin ? "Save Booking" : (isPending ? "Request Pending" : (isEdit ? "Request Booking Update" : "Submit Booking Inquiry"))))}
                         </button>
                         {reviewRequestId && isAdmin && (
                             <button
