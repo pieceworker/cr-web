@@ -171,14 +171,22 @@ export async function approveUnifiedRequest(requestId: string) {
         }
     }
     else if (request.type === 'ARTIST_EDIT') {
+        const artist = await db.prepare("SELECT image FROM artists WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
+        if (artist?.image && artist.image !== data.image) {
+            await deleteR2Image(artist.image);
+        }
         statements.push(db.prepare(
             "UPDATE artists SET name = ?, location = ?, bio = ?, image = ?, chapters = ?, members = ?, status = 'APPROVED', image_preference = ? WHERE id = ?"
         ).bind(data.name, data.location, data.bio, data.image, JSON.stringify(data.chapters), JSON.stringify(data.members), data.image_preference || 'custom', request.target_id));
     } else if (request.type === 'ARTIST_ADD') {
         statements.push(db.prepare("UPDATE artists SET status = 'APPROVED' WHERE id = ?").bind(request.target_id));
     } else if (request.type === 'BOOKING_EDIT') {
-        statements.push(db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ? WHERE id = ?").bind(
-            data.name, data.email, data.phone, data.questions, data.image_preference || 'custom', request.target_id
+        const booking = await db.prepare("SELECT image FROM bookings WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
+        if (booking?.image && booking.image !== data.image) {
+            await deleteR2Image(booking.image);
+        }
+        statements.push(db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ?, image = ? WHERE id = ?").bind(
+            data.name, data.email, data.phone, data.questions, data.image_preference || 'custom', data.image || null, request.target_id
         ));
         statements.push(db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(request.target_id));
 
@@ -227,6 +235,28 @@ export async function rejectUnifiedRequest(requestId: string) {
     if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
 
     const db = await getDB();
+    const request = await db.prepare("SELECT * FROM requests WHERE id = ?").bind(requestId).first() as UnifiedRequest | null;
+    if (!request) throw new Error("Request not found");
+
+    const data = request.data ? JSON.parse(request.data) : {};
+    const proposedImage = data.image;
+
+    if (proposedImage) {
+        if (request.type === 'ARTIST_ADD' || request.type === 'BOOKING_INQUIRY') {
+            await deleteR2Image(proposedImage);
+        } else if (request.type === 'ARTIST_EDIT') {
+            const current = await db.prepare("SELECT image FROM artists WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
+            if (current?.image !== proposedImage) {
+                await deleteR2Image(proposedImage);
+            }
+        } else if (request.type === 'BOOKING_EDIT') {
+            const current = await db.prepare("SELECT image FROM bookings WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
+            if (current?.image !== proposedImage) {
+                await deleteR2Image(proposedImage);
+            }
+        }
+    }
+
     await db.prepare("UPDATE requests SET status = 'REJECTED' WHERE id = ?").bind(requestId).run();
 
     revalidatePath("/admin");
@@ -390,6 +420,10 @@ export async function updateArtist(formData: FormData) {
     const reviewRequestId = formData.get("reviewRequestId") as string | null;
 
     if (isAdmin(session?.user?.email) && isAdminAction) {
+        const current = await db.prepare("SELECT image FROM artists WHERE id = ?").bind(id).first() as { image: string | null } | null;
+        if (current?.image && current.image !== image) {
+            await deleteR2Image(current.image);
+        }
         const statements = [
             db.prepare(
                 "UPDATE artists SET name = ?, location = ?, bio = ?, image = ?, chapters = ?, members = ?, status = 'APPROVED', image_preference = ? WHERE id = ?"
@@ -756,6 +790,7 @@ export async function updateBooking(formData: FormData) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
     const questions = formData.get("questions") as string;
+    const image = formData.get("image") as string;
     const imagePreference = formData.get("image_preference") as string || 'custom';
     const isAdminAction = formData.get("isAdminAction") === "true";
 
@@ -770,16 +805,19 @@ export async function updateBooking(formData: FormData) {
     const db = await getDB();
 
     // Check ownership or admin
-    const existingResult = await db.prepare("SELECT created_by FROM bookings WHERE id = ?").bind(id).first();
-    const existing = existingResult as { created_by: string } | null;
+    const existingResult = await db.prepare("SELECT created_by, image FROM bookings WHERE id = ?").bind(id).first();
+    const existing = existingResult as { created_by: string; image: string | null } | null;
     if (!existing) throw new Error("Booking not found");
     if (!isAdmin(session?.user?.email) && existing.created_by !== session.user.id) throw new Error("Unauthorized");
 
     if (isAdmin(session?.user?.email) && isAdminAction) {
+        if (existing.image && existing.image !== image) {
+            await deleteR2Image(existing.image);
+        }
         const reviewRequestId = formData.get("reviewRequestId") as string | null;
         const statements = [
-            db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ? WHERE id = ?").bind(
-                name, email, phone, questions, imagePreference, id
+            db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ?, image = ? WHERE id = ?").bind(
+                name, email, phone, questions, imagePreference, image, id
             ),
             db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(id)
         ];
@@ -810,7 +848,7 @@ export async function updateBooking(formData: FormData) {
         await db.batch(statements);
     } else {
         await createUnifiedRequest("BOOKING_EDIT", id, {
-            name, email, phone, questions, image_preference: imagePreference,
+            name, email, phone, questions, image, image_preference: imagePreference,
             dates, times, durations, eventTypes, locations, descriptions, budgets
         });
     }
