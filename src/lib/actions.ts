@@ -466,7 +466,10 @@ export async function leaveArtist(artistId: string) {
     const newMembers = members.filter(id => id !== session.user!.id);
 
     if (newMembers.length === 0) {
-        // If no members left, delete the artist
+        // If no members left, delete the artist and cleanup image
+        if (artist.image) {
+            await deleteR2Image(artist.image);
+        }
         await db.prepare("DELETE FROM artists WHERE id = ?").bind(artistId).run();
     } else {
         await db.prepare("UPDATE artists SET members = ? WHERE id = ?")
