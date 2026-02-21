@@ -48,24 +48,26 @@ async function getAdminData() {
     const usersResult = await db.prepare("SELECT * FROM users").all();
     const users = usersResult.results as unknown as User[];
 
-    // Fetch all artists and bookings to match R2 images against
+    // Fetch all artists, bookings, and chapters to match R2 images against
     const allArtists = artists.results as unknown as Artist[];
     const allBookings = bookingsRes.results as unknown as Booking[];
+    const allChapters = chapters.results as unknown as Chapter[];
 
     // Use R2 binding as source of truth for images
     const r2List = await env.R2.list();
     const uploadedImages = r2List.objects.map(obj => {
         const url = `/api/image/${obj.key}`;
 
-        // Find matching artist or booking
+        // Find matching artist, booking, or chapter
         const artist = allArtists.find(a => a.image === url);
         const booking = allBookings.find(b => b.image === url);
+        const chapter = allChapters.find(c => c.image === url);
 
         return {
-            id: artist?.id || booking?.id || obj.key,
-            name: artist?.name || booking?.name || obj.key,
+            id: artist?.id || booking?.id || chapter?.id || obj.key,
+            name: artist?.name || booking?.name || chapter?.location || obj.key,
             image: url,
-            type: artist ? 'artist' : (booking ? 'booking' : 'unlinked')
+            type: artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : 'unlinked'))
         };
     });
 
@@ -208,7 +210,7 @@ export default async function AdminPage() {
                             className="group block bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-2 hover:border-red-600 transition-all shadow-sm"
                         >
                             <Link
-                                href={img.type === 'unlinked' ? img.image : (img.type === 'artist' ? `/artists/${img.id}` : `/bookings/${img.id}`)}
+                                href={img.type === 'unlinked' ? img.image : (img.type === 'artist' ? `/artists/${img.id}` : (img.type === 'chapter' ? `/chapters/${img.id}` : `/bookings/${img.id}`))}
                                 target={img.type === 'unlinked' ? "_blank" : undefined}
                             >
                                 <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden">
