@@ -6,14 +6,30 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { revalidatePath } from "next/cache";
 
 async function getDB() {
-    const ctx = await getCloudflareContext();
-    return ctx.env.DB;
+    const { env } = await getCloudflareContext();
+    return env.DB;
+}
+
+/**
+ * Helper to delete an image from R2 if it's a relative path starting with /api/image/
+ */
+async function deleteR2Image(imagePath: string | null) {
+    if (!imagePath || !imagePath.startsWith("/api/image/")) return;
+
+    const key = imagePath.replace("/api/image/", "");
+    const { env } = await getCloudflareContext();
+    try {
+        await env.R2.delete(key);
+    } catch (e) {
+        console.error(`Failed to delete R2 image ${key}:`, e);
+    }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getArtistCleanupStatements(db: any, userId: string) {
     const artists = await db.prepare("SELECT id, members FROM artists WHERE members LIKE ?").bind(`%${userId}%`).all();
     const cleanupStatements = [];
+    const imagesToDelete = [];
     for (const artist of (artists.results as unknown as Artist[])) {
         const members = JSON.parse(artist.members || "[]") as string[];
         if (members.includes(userId)) {
@@ -21,12 +37,13 @@ async function getArtistCleanupStatements(db: any, userId: string) {
             if (filteredMembers.length === 0) {
                 cleanupStatements.push(db.prepare("DELETE FROM artists WHERE id = ?").bind(artist.id));
                 cleanupStatements.push(db.prepare("DELETE FROM requests WHERE target_id = ?").bind(artist.id));
+                if (artist.image) imagesToDelete.push(artist.image);
             } else {
                 cleanupStatements.push(db.prepare("UPDATE artists SET members = ? WHERE id = ?").bind(JSON.stringify(filteredMembers), artist.id));
             }
         }
     }
-    return cleanupStatements;
+    return { cleanupStatements, imagesToDelete };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,8 +129,13 @@ export async function approveUnifiedRequest(requestId: string) {
                 ));
             }
         } else if (role === 'Audience') {
-            const cleanup = await getArtistCleanupStatements(db, request.user_id);
+            const { cleanupStatements: cleanup, imagesToDelete } = await getArtistCleanupStatements(db, request.user_id);
             statements.push(...cleanup);
+            if (imagesToDelete.length > 0) {
+                setTimeout(() => {
+                    imagesToDelete.forEach(img => deleteR2Image(img));
+                }, 0);
+            }
         }
     } else if (request.type === 'USER_EDIT') {
         const roleStr = data.role || 'Audience';
@@ -256,7 +278,13 @@ export async function deleteChapter(chapterId: string) {
     if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
 
     const db = await getDB();
+    const chapter = await db.prepare("SELECT image FROM chapters WHERE id = ?").bind(chapterId).first() as { image: string | null } | null;
+
     await db.prepare("DELETE FROM chapters WHERE id = ?").bind(chapterId).run();
+
+    if (chapter?.image) {
+        await deleteR2Image(chapter.image);
+    }
 
     revalidatePath("/admin");
     revalidatePath("/directories");
@@ -318,7 +346,7 @@ export async function deleteArtist(artistId: string) {
     const session = await auth();
     const db = await getDB();
 
-    const artist = await db.prepare("SELECT owner_id FROM artists WHERE id = ?").bind(artistId).first() as { owner_id: string } | null;
+    const artist = await db.prepare("SELECT owner_id, image FROM artists WHERE id = ?").bind(artistId).first() as { owner_id: string; image: string | null } | null;
     if (!artist) throw new Error("Artist not found");
 
     if (!isAdmin(session?.user?.email) && session?.user?.id !== artist.owner_id) {
@@ -329,6 +357,10 @@ export async function deleteArtist(artistId: string) {
         db.prepare("DELETE FROM artists WHERE id = ?").bind(artistId),
         db.prepare("DELETE FROM requests WHERE target_id = ?").bind(artistId)
     ]);
+
+    if (artist.image) {
+        await deleteR2Image(artist.image);
+    }
 
     revalidatePath("/admin");
     revalidatePath("/directories");
@@ -501,7 +533,7 @@ export async function deleteBooking(bookingId: string) {
     const db = await getDB();
 
     // Check permissions: Admin or Creator
-    const booking = await db.prepare("SELECT created_by FROM bookings WHERE id = ?").bind(bookingId).first() as { created_by: string } | null;
+    const booking = await db.prepare("SELECT created_by, image FROM bookings WHERE id = ?").bind(bookingId).first() as { created_by: string; image: string | null } | null;
     if (!booking) throw new Error("Booking not found");
 
     if (!isAdmin(session?.user?.email) && session?.user?.id !== booking.created_by) {
@@ -512,6 +544,10 @@ export async function deleteBooking(bookingId: string) {
         db.prepare("DELETE FROM bookings WHERE id = ?").bind(bookingId),
         db.prepare("DELETE FROM requests WHERE target_id = ?").bind(bookingId)
     ]);
+
+    if (booking.image) {
+        await deleteR2Image(booking.image);
+    }
 
     revalidatePath("/admin");
     revalidatePath("/bookings");
@@ -569,8 +605,16 @@ export async function updateUser(formData: FormData) {
             ));
         }
     } else if (role === 'Audience') {
-        const cleanup = await getArtistCleanupStatements(db, id);
+        const { cleanupStatements: cleanup, imagesToDelete } = await getArtistCleanupStatements(db, id);
         statements.push(...cleanup);
+
+        // Handle R2 cleanup after batch if any
+        if (imagesToDelete.length > 0) {
+            // We can't await here easily if we want to batch, but we can do it after
+            setTimeout(() => {
+                imagesToDelete.forEach(img => deleteR2Image(img));
+            }, 0);
+        }
 
         const staleRequestCleanup = await getPendingArtistRequestCleanupStatements(db, id);
         statements.push(...staleRequestCleanup);
@@ -589,15 +633,21 @@ export async function deleteUser(userId: string) {
 
     const db = await getDB();
 
-    // 1. Get user for existence check
+    // 1. Get user for existence check and image cleanup
     const user = await db.prepare("SELECT name FROM users WHERE id = ?").bind(userId).first() as { name: string } | null;
     if (!user) throw new Error("User not found");
 
-    // 2. Fetch all artists to determine deletions vs updates
-    const allArtistsResult = await db.prepare("SELECT * FROM artists").all();
-    const allArtists = allArtistsResult.results as unknown as Artist[];
+    // 2. Fetch all artists and bookings to identify images for cleanup
+    const artistsToDelete = await db.prepare("SELECT id, image FROM artists WHERE owner_id = ?").bind(userId).all();
+    const bookingsToDelete = await db.prepare("SELECT id, image FROM bookings WHERE created_by = ?").bind(userId).all();
 
-    const artistsToDelete = allArtists.filter(a => a.owner_id === userId).map(a => a.id);
+    const artistImages = (artistsToDelete.results as { image: string | null }[]).map(a => a.image).filter(Boolean);
+    const bookingImages = (bookingsToDelete.results as { image: string | null }[]).map(b => b.image).filter(Boolean);
+
+    // 3. Fetch all artists to determine deletions vs updates
+    const allArtistsResult = await db.prepare("SELECT id, owner_id, members FROM artists").all();
+    const allArtists = (allArtistsResult.results as unknown) as Artist[];
+
     const artistsToUpdate = allArtists.filter(a => a.owner_id !== userId && a.members?.includes(userId)).map(a => {
         let members: string[] = JSON.parse(a.members || "[]");
         members = members.filter(id => id !== userId);
@@ -606,20 +656,24 @@ export async function deleteUser(userId: string) {
 
     const staleRequestCleanup = await getPendingArtistRequestCleanupStatements(db, userId);
 
-    // 3. Prepare batch statements
+    // 4. Prepare batch statements
     const statements = [
         db.prepare("DELETE FROM users WHERE id = ?").bind(userId),
         db.prepare("DELETE FROM role_requests WHERE user_id = ?").bind(userId),
         db.prepare("DELETE FROM requests WHERE user_id = ? OR target_id = ?").bind(userId, userId),
         db.prepare("DELETE FROM bookings WHERE created_by = ?").bind(userId),
-        // booking_artists cleanup is handled by CASCADE if configured, but let's be safe
         db.prepare("DELETE FROM booking_artists WHERE booking_id IN (SELECT id FROM bookings WHERE created_by = ?)").bind(userId),
-        ...artistsToDelete.map(id => db.prepare("DELETE FROM artists WHERE id = ?").bind(id)),
+        ...(artistsToDelete.results as unknown as Artist[]).map(a => db.prepare("DELETE FROM artists WHERE id = ?").bind(a.id)),
         ...artistsToUpdate.map(a => db.prepare("UPDATE artists SET members = ? WHERE id = ?").bind(a.members, a.id)),
         ...staleRequestCleanup
     ];
 
     await db.batch(statements);
+
+    // 5. Cleanup R2 images
+    for (const img of [...artistImages, ...bookingImages]) {
+        if (img) await deleteR2Image(img);
+    }
 
     revalidatePath("/admin");
     revalidatePath("/directories");
