@@ -64,7 +64,11 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="text-center md:text-right">
+        <div className="text-center md:text-right space-y-2">
+          <div className="flex justify-center md:justify-end gap-4 text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 transition-colors">
+            <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+            <Link href="/terms" className="hover:underline">Terms of Service</Link>
+          </div>
           <p className="text-[10px] text-zinc-400 uppercase tracking-tighter">
             © {new Date().getFullYear()} Classical Revolution <br />
             San Francisco, CA
