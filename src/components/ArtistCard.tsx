@@ -52,11 +52,11 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
                 <div className="w-32 h-32 bg-zinc-200 dark:bg-zinc-800 border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
                     {displayImage && <Image src={displayImage} alt={displayArtist.name} fill className="object-cover" unoptimized />}
                 </div>
-                <div className="flex-1 space-y-2 w-full">
+                <div className="flex-1 space-y-2 min-w-0 w-full">
                     <div className="flex justify-between items-start">
                         <div>
                             <div className="flex items-center gap-3">
-                                <h3 className="text-3xl font-black uppercase italic font-heading tracking-tighter leading-none">{displayArtist.name}</h3>
+                                <h3 className="text-3xl font-black uppercase italic font-heading tracking-tighter leading-none break-words">{displayArtist.name}</h3>
                                 {a.status === 'PENDING' && <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 text-[10px] font-bold uppercase px-2 py-0.5 tracking-tighter">New Profile</span>}
                                 {pendingEdit && <span className="bg-red-100 dark:bg-red-900/30 text-red-600 text-[10px] font-bold uppercase px-2 py-0.5 tracking-tighter">Edit Pending</span>}
                             </div>

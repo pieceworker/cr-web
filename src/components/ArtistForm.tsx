@@ -193,7 +193,7 @@ export default function ArtistForm({
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <label className={LABEL}>Chapters</label>
-                        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black">
                             {chapters.map(c => (
                                 <label key={c.id} className={CHECKBOX_LABEL}>
                                     <input
@@ -286,7 +286,7 @@ export default function ArtistForm({
 
                         {imagePreference === 'custom' && (
                             <div className="space-y-4 pt-2">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {(artist?.image || pendingData?.image) && (
                                         <div className="space-y-1">
                                             <p className={LABEL}>Current Custom Image</p>

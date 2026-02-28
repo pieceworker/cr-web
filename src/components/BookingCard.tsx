@@ -37,15 +37,15 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
                             />
                         )}
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-3">
                             <div className={`text-[10px] font-black uppercase px-2 py-0.5 tracking-widest ${b.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                 {b.status}
                             </div>
-                            <h3 className="text-2xl font-black uppercase italic font-heading tracking-tighter">{b.name}</h3>
+                            <h3 className="text-2xl font-black uppercase italic font-heading tracking-tighter break-words">{b.name}</h3>
                             {pendingEdit && <span className="text-[8px] font-black bg-red-600 text-white px-2 py-0.5 tracking-tighter uppercase italic">Edit Pending</span>}
                         </div>
-                        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">{b.email} {b.phone ? `• ${b.phone}` : ''}</p>
+                        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest break-all">{b.email} {b.phone ? `• ${b.phone}` : ''}</p>
                         <p className="text-[10px] text-red-600 font-black uppercase tracking-widest">
                             Requested by <Link href={`/profile/${b.created_by}`} className="hover:underline">{b.user_name}</Link>
                         </p>
@@ -86,7 +86,7 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <p className="text-sm font-bold uppercase tracking-tight">{date.event_type} @ {date.location}</p>
+                            <p className="text-sm font-bold uppercase tracking-tight break-words">{date.event_type} @ {date.location}</p>
                             <p className="text-sm text-zinc-600 dark:text-zinc-400 italic">&ldquo;{date.description}&rdquo;</p>
                             <p className="text-xs font-bold text-zinc-500">Budget: {date.budget || 'Not specified'}</p>
                         </div>

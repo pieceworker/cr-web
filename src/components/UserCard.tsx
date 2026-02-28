@@ -45,15 +45,15 @@ export default function UserCard({ u, requests, chapters, isAdmin = false }: Use
                     <div className="w-12 h-12 rounded-full border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
                         {u.image && <Image src={u.image} alt={u.name || 'User'} fill className="object-cover" unoptimized />}
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <div className="flex items-center gap-2">
                             <Link href={`/profile/${u.id}`} className="hover:underline decoration-red-600 decoration-2 transition-all">
-                                <p className="text-lg font-bold leading-tight">{u.name}</p>
+                                <p className="text-lg font-bold leading-tight break-words">{u.name}</p>
                             </Link>
                             {pendingUserEdit && <span className="bg-red-100 dark:bg-red-900/30 text-red-600 text-[8px] font-bold uppercase px-1.5 py-0.5 tracking-tighter">Edit Pending</span>}
                             {pendingRoleRequest && <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 text-[8px] font-bold uppercase px-1.5 py-0.5 tracking-tighter">Role Pending</span>}
                         </div>
-                        <p className="text-xs text-zinc-500 font-medium italic">{u.email}</p>
+                        <p className="text-xs text-zinc-500 font-medium italic break-all">{u.email}</p>
                         <p className="text-[10px] font-black uppercase text-red-600 tracking-widest mt-0.5">{u.role}</p>
                     </div>
                 </div>
