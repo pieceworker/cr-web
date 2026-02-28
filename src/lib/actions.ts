@@ -116,7 +116,7 @@ export async function approveUnifiedRequest(requestId: string) {
             if (!existing) {
                 const user = await db.prepare("SELECT name, image, chapters FROM users WHERE id = ?").bind(request.user_id).first() as User;
                 statements.push(db.prepare(
-                    "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?)"
+                    "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)"
                 ).bind(
                     crypto.randomUUID(),
                     user.name || "New Artist",
@@ -125,7 +125,8 @@ export async function approveUnifiedRequest(requestId: string) {
                     user.image || null,
                     request.user_id,
                     JSON.stringify([request.user_id]),
-                    user.chapters || "[]"
+                    user.chapters || "[]",
+                    'google'
                 ));
             }
         } else if (role === 'Audience') {
@@ -156,7 +157,7 @@ export async function approveUnifiedRequest(requestId: string) {
             const existing = await db.prepare("SELECT id FROM artists WHERE owner_id = ?").bind(request.target_id).first();
             if (!existing) {
                 statements.push(db.prepare(
-                    "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?)"
+                    "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)"
                 ).bind(
                     crypto.randomUUID(),
                     data.name || "New Artist",
@@ -165,7 +166,8 @@ export async function approveUnifiedRequest(requestId: string) {
                     null, // we don't have user image here easily without another query, or it's unchanged
                     request.target_id,
                     JSON.stringify([request.target_id]),
-                    JSON.stringify(data.chapters || [])
+                    JSON.stringify(data.chapters || []),
+                    'google'
                 ));
             }
         }
@@ -629,7 +631,7 @@ export async function updateUser(formData: FormData) {
         if (!existing) {
             const user = await db.prepare("SELECT image FROM users WHERE id = ?").bind(id).first() as { image: string | null };
             statements.push(db.prepare(
-                "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?)"
+                "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)"
             ).bind(
                 crypto.randomUUID(),
                 name,
@@ -638,7 +640,8 @@ export async function updateUser(formData: FormData) {
                 user?.image || null,
                 id,
                 JSON.stringify([id]),
-                JSON.stringify(chapters)
+                JSON.stringify(chapters),
+                'google'
             ));
         }
     } else if (role === 'Audience') {
