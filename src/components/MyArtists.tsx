@@ -18,7 +18,7 @@ export default function MyArtists({ artists, chapters, currentUserId, availableM
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     return (
-        <div className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
+        <section className="space-y-6">
             <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
                 <h2 className="text-2xl font-bold uppercase text-red-600 font-heading italic">My Artists</h2>
                 <button
@@ -61,6 +61,6 @@ export default function MyArtists({ artists, chapters, currentUserId, availableM
                     onClose={() => setIsCreateOpen(false)}
                 />
             )}
-        </div>
+        </section>
     );
 }
