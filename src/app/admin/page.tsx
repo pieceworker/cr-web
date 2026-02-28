@@ -131,7 +131,7 @@ export default async function AdminPage() {
             {/* Users */}
             <section>
                 <h2 className={SECTION_HEADER}>Users ({users.length})</h2>
-                <div className="grid gap-4 mt-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="grid gap-4 mt-6">
                     {users.map((u) => <UserCard key={u.id} u={u} requests={requests} chapters={chapters} isAdmin={true} />)}
                 </div>
             </section>

@@ -31,13 +31,9 @@ export default function UserSetup({ user, chapters }: UserSetupProps) {
     }
 
     return (
-        <div className="relative min-h-full">
-            {/* Full-height backdrop */}
-            <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-[2px] h-full pointer-events-auto" />
-
-            {/* Sticky viewport-centered modal */}
-            <div className="sticky top-0 h-[100dvh] flex items-center justify-center px-2 py-4 sm:p-4 pointer-events-none">
-                <div className="relative bg-white dark:bg-zinc-900 w-full max-w-lg px-2 py-8 sm:p-8 border-4 border-red-600 shadow-2xl overflow-y-auto max-h-[90vh] pointer-events-auto">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-white/60 dark:bg-black/60 backdrop-blur-[2px]">
+            <div className="flex min-h-full items-center justify-center p-4">
+                <div className="relative bg-white dark:bg-zinc-900 w-full max-w-lg px-2 py-8 sm:p-8 border-4 border-red-600 shadow-2xl">
                     <h2 className="text-3xl font-black uppercase italic text-red-600 mb-6 font-heading tracking-tighter">
                         Complete Your Profile
                     </h2>

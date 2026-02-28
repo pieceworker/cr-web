@@ -193,7 +193,7 @@ export default function ArtistForm({
                 <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                         <label className={LABEL}>Chapters</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black">
                             {chapters.map(c => (
                                 <label key={c.id} className={CHECKBOX_LABEL}>
                                     <input
@@ -214,7 +214,7 @@ export default function ArtistForm({
                     </div>
                     <div className="space-y-4">
                         <label className={LABEL}>Members (Optional)</label>
-                        <div className="grid gap-2 max-h-48 overflow-y-auto p-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black">
+                        <div className="grid gap-2 p-2 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-black">
                             {!isAdmin && (
                                 <div className="flex items-center gap-3 p-2 bg-zinc-100 dark:bg-zinc-900/50 opacity-60">
                                     <input type="checkbox" checked readOnly className="accent-red-600 w-4 h-4 cursor-not-allowed" />
