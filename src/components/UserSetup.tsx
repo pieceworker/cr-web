@@ -31,7 +31,7 @@ export default function UserSetup({ user, chapters }: UserSetupProps) {
     }
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-white/60 dark:bg-black/60 backdrop-blur-[2px]">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-white/60 dark:bg-black/60 backdrop-blur-[2px] pointer-events-auto">
             <div className="flex min-h-full items-center justify-center p-4">
                 <div className="relative bg-white dark:bg-zinc-900 w-full max-w-lg px-2 py-8 sm:p-8 border-4 border-red-600 shadow-2xl">
                     <h2 className="text-3xl font-black uppercase italic text-red-600 mb-6 font-heading tracking-tighter">
