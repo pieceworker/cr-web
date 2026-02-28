@@ -18,12 +18,12 @@ export default function MyArtists({ artists, chapters, currentUserId, availableM
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     return (
-        <div className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
+        <div className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
             <div className="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-4">
                 <h2 className="text-2xl font-bold uppercase text-red-600 font-heading italic">My Artists</h2>
                 <button
                     onClick={() => setIsCreateOpen(true)}
-                    className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-4 text-xs hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-colors tracking-widest"
+                    className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-2 sm:px-4 text-xs hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-colors tracking-widest"
                 >
                     + Create New
                 </button>
@@ -43,7 +43,7 @@ export default function MyArtists({ artists, chapters, currentUserId, availableM
                             isAdmin={false}
                             actions={
                                 <form action={leaveArtist.bind(null, artist.id)}>
-                                    <button className="bg-transparent border border-zinc-300 dark:border-zinc-700 font-bold uppercase py-2 px-6 hover:border-zinc-900 dark:hover:border-white transition-all text-xs tracking-widest">
+                                    <button className="bg-transparent border border-zinc-300 dark:border-zinc-700 font-bold uppercase py-2 px-2 sm:px-6 hover:border-zinc-900 dark:hover:border-white transition-all text-xs tracking-widest">
                                         Leave
                                     </button>
                                 </form>

@@ -49,7 +49,7 @@ export default async function ChapterProfilePage({ params }: { params: Promise<{
     });
 
     return (
-        <div className="max-w-6xl mx-auto py-20 px-6 space-y-16">
+        <div className="max-w-6xl mx-auto py-20 px-2 sm:px-6 space-y-16">
             <div className="grid md:grid-cols-2 gap-12 items-start">
                 <div className="aspect-video bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden relative">
                     {chapter.image && <Image src={chapter.image} alt={chapter.location} fill className="object-cover" unoptimized />}
@@ -76,7 +76,7 @@ export default async function ChapterProfilePage({ params }: { params: Promise<{
 
             {/* Directors */}
             {directors.length > 0 && (
-                <section className="space-y-8 bg-black dark:bg-zinc-900 text-white p-12 -mx-6 md:mx-0">
+                <section className="space-y-8 bg-black dark:bg-zinc-900 text-white px-2 py-12 sm:p-12 mx-0 sm:-mx-6 md:mx-0">
                     <h2 className="text-3xl font-black uppercase italic text-red-600 border-b-4 border-red-600 inline-block font-heading">
                         Chapter Directors
                     </h2>

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function DonatePage() {
   return (
-    <div className="flex flex-col gap-10 py-10 px-6 max-w-6xl mx-auto text-center transition-colors">
+    <div className="flex flex-col gap-10 py-10 px-2 sm:px-6 max-w-6xl mx-auto text-center transition-colors">
       <section className="space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic text-zinc-900 dark:text-white">
           Support
@@ -13,7 +13,7 @@ export default function DonatePage() {
       </section>
 
       {/* Fiscal Sponsor Section */}
-      <div className="bg-zinc-50 dark:bg-zinc-900 p-8 md:p-12 border border-zinc-200 dark:border-zinc-800 space-y-8">
+      <div className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 md:p-12 border border-zinc-200 dark:border-zinc-800 space-y-8">
         <div className="space-y-2">
           <p className="text-red-600 uppercase text-xs tracking-[0.2em] font-black">
             Secure Donation Portal
@@ -30,7 +30,7 @@ export default function DonatePage() {
           href="https://form-renderer-app.donorperfect.io/give/intermusic-sf/classical-revolution"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block w-full bg-zinc-900 text-white dark:bg-white dark:text-black py-5 px-8 font-black uppercase tracking-widest hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all shadow-xl text-lg"
+          className="inline-block w-full bg-zinc-900 text-white dark:bg-white dark:text-black py-5 px-2 sm:px-8 font-black uppercase tracking-widest hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all shadow-xl text-lg"
         >
           Donate Now
         </Link>

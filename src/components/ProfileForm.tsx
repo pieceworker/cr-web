@@ -89,13 +89,13 @@ export default function ProfileForm({
             <input type="hidden" name="id" value={user.id} />
             {reviewRequestId && <input type="hidden" name="reviewRequestId" value={reviewRequestId} />}
             {error && (
-                <div className="p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-bold uppercase tracking-wide">
+                <div className="px-2 py-4 sm:p-4 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-bold uppercase tracking-wide">
                     ⚠️ {error}
                 </div>
             )}
 
             {isPending && !isModal && !reviewRequestId && (
-                <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 p-4 mb-6">
+                <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 px-2 py-4 sm:p-4 mb-6">
                     <p className="text-sm font-medium italic text-zinc-800 dark:text-zinc-200">
                         A profile update or role change is currently pending approval.
                         The form is disabled until the request is processed.
@@ -132,7 +132,7 @@ export default function ProfileForm({
                 </div>
 
                 {role === 'Chapter Director' && (
-                    <div className="p-6 bg-red-50 dark:bg-red-900/10 border-2 border-red-600/20 space-y-4">
+                    <div className="px-2 py-6 sm:p-6 bg-red-50 dark:bg-red-900/10 border-2 border-red-600/20 space-y-4">
                         <label className={`${LABEL} text-red-600`}>Directorship Chapters (Min 1)</label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                             {chapters.map(c => (
@@ -221,7 +221,7 @@ export default function ProfileForm({
                                 formData.append("requestId", reviewRequestId);
                                 import("@/lib/actions").then(m => m.rejectUnifiedRequest(reviewRequestId));
                             }}
-                            className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-4 px-8 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-all text-sm tracking-widest active:scale-[0.98]"
+                            className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-4 px-2 sm:px-8 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-all text-sm tracking-widest active:scale-[0.98]"
                         >
                             Reject Request
                         </button>

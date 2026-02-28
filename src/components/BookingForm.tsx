@@ -188,7 +188,7 @@ export default function BookingForm({
 
             <fieldset disabled={(disabled || (isPending && !isAdmin)) && !reviewRequestId} className="space-y-8">
                 {isPending && !isAdmin && !reviewRequestId && (
-                    <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 p-4 mb-6">
+                    <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 px-2 py-4 sm:p-4 mb-6">
                         <p className="text-sm font-medium italic text-zinc-800 dark:text-zinc-200">
                             An edit for this booking is currently pending approval.
                             The form shows the proposed changes.
@@ -196,7 +196,7 @@ export default function BookingForm({
                     </div>
                 )}
 
-                <div className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
+                <div className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
                     <h3 className="text-xl font-bold uppercase tracking-tight border-b-2 border-red-600 inline-block">Contact Info</h3>
                     <div className="grid md:grid-cols-2 gap-6">
                         <div>
@@ -240,7 +240,7 @@ export default function BookingForm({
                         <button
                             type="button"
                             onClick={addDate}
-                            className={`text-xs font-bold uppercase tracking-widest py-2 px-4 transition-colors ${disabled || (isPending && !isAdmin)
+                            className={`text-xs font-bold uppercase tracking-widest py-2 px-2 sm:px-4 transition-colors ${disabled || (isPending && !isAdmin)
                                 ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
                                 : "bg-zinc-900 text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white"
                                 }`}
@@ -250,7 +250,7 @@ export default function BookingForm({
                     </div>
 
                     {dates.map((d: BookingDateItem, index: number) => (
-                        <div key={d.id} className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-200 dark:border-zinc-800 space-y-6 relative group">
+                        <div key={d.id} className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 border border-zinc-200 dark:border-zinc-800 space-y-6 relative group">
                             {dates.length > 1 && (
                                 <button
                                     type="button"
@@ -302,7 +302,7 @@ export default function BookingForm({
                     ))}
                 </div>
 
-                <div className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
+                <div className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-2">Any other questions?</label>
                         <textarea
@@ -315,7 +315,7 @@ export default function BookingForm({
 
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Display Image</label>
-                        <div className="space-y-4 bg-white dark:bg-black p-6 border border-zinc-200 dark:border-zinc-800">
+                        <div className="space-y-4 bg-white dark:bg-black px-2 py-6 sm:p-6 border border-zinc-200 dark:border-zinc-800">
                             <div className="flex gap-6">
                                 <label className="flex items-center gap-2 cursor-pointer group">
                                     <input
@@ -418,7 +418,7 @@ export default function BookingForm({
                                 onClick={() => {
                                     import("@/lib/actions").then(m => m.rejectUnifiedRequest(reviewRequestId));
                                 }}
-                                className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-4 px-8 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-all text-sm tracking-widest active:scale-[0.98] shadow-lg"
+                                className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-4 px-2 sm:px-8 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-all text-sm tracking-widest active:scale-[0.98] shadow-lg"
                             >
                                 Reject Request
                             </button>

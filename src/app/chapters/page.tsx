@@ -16,7 +16,7 @@ export default async function ChaptersPage() {
     const chapters = await getChapters();
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-6">
+        <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6">
             <section className="space-y-12">
                 <div className="space-y-4">
                     <h1 className="text-5xl md:text-7xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none tracking-tighter">
@@ -27,7 +27,7 @@ export default async function ChaptersPage() {
 
                 <div className="grid md:grid-cols-3 gap-8">
                     {chapters.length > 0 ? chapters.map((c) => (
-                        <Link href={`/chapters/${c.id}`} key={c.id} className="group cursor-pointer block border border-zinc-200 dark:border-zinc-800 p-4 hover:border-red-600 transition-all">
+                        <Link href={`/chapters/${c.id}`} key={c.id} className="group cursor-pointer block border border-zinc-200 dark:border-zinc-800 px-2 py-4 sm:p-4 hover:border-red-600 transition-all">
                             <div className="aspect-video bg-zinc-100 dark:bg-zinc-900 overflow-hidden mb-6 border border-zinc-100 dark:border-zinc-800 relative">
                                 {c.image && <Image src={c.image} alt={c.location} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
                             </div>

@@ -57,7 +57,7 @@ export default async function ArtistsPage() {
     const isMusician = userRole === 'Musician' || userRole === 'Chapter Director';
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-6 space-y-24">
+        <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6 space-y-24">
             <section className="space-y-12">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-6">
                     <div className="space-y-4">
@@ -70,7 +70,7 @@ export default async function ArtistsPage() {
 
                 <div className="grid md:grid-cols-3 gap-8">
                     {artists.length > 0 ? artists.map((a) => (
-                        <Link href={`/artists/${a.id}`} key={a.id} className="group cursor-pointer block border border-zinc-200 dark:border-zinc-800 p-4 hover:border-red-600 transition-all">
+                        <Link href={`/artists/${a.id}`} key={a.id} className="group cursor-pointer block border border-zinc-200 dark:border-zinc-800 px-2 py-4 sm:p-4 hover:border-red-600 transition-all">
                             <div className="aspect-square bg-zinc-100 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 mb-6 overflow-hidden relative">
                                 {(() => {
                                     const owner = availableMusicians.find(u => u.id === a.owner_id);

@@ -32,7 +32,7 @@ export default async function ArtistProfilePage({ params }: { params: Promise<{ 
     const { artist, members } = data;
 
     return (
-        <div className="max-w-6xl mx-auto py-20 px-6 space-y-12">
+        <div className="max-w-6xl mx-auto py-20 px-2 sm:px-6 space-y-12">
             <div className="flex flex-col md:flex-row gap-12 items-center md:items-start text-center md:text-left">
                 {/* Artist Image / Member Rings */}
                 <div className="relative group">

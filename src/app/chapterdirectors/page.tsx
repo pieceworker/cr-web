@@ -16,7 +16,7 @@ export default async function ChapterDirectorsPage() {
     const directors = await getDirectors();
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-6">
+        <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6">
             <section className="space-y-12">
                 <div className="space-y-4">
                     <h1 className="text-5xl md:text-7xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none tracking-tighter">

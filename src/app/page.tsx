@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-10 md:gap-16 py-10 px-6 max-w-6xl mx-auto overflow-x-hidden transition-colors">
+    <div className="flex flex-col gap-10 md:gap-16 py-10 px-2 sm:px-6 max-w-6xl mx-auto overflow-x-hidden transition-colors">
       {/* Hero Section */}
       <section className="flex flex-col lg:flex-row items-center gap-10">
         <div className="flex-1 space-y-6">
@@ -19,13 +19,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
               href="/events"
-              className="inline-flex items-center justify-center bg-zinc-900 text-white dark:bg-white dark:text-black px-8 h-14 font-bold hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all text-center uppercase"
+              className="inline-flex items-center justify-center bg-zinc-900 text-white dark:bg-white dark:text-black px-2 sm:px-8 h-14 font-bold hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white transition-all text-center uppercase"
             >
               Find an Event
             </Link>
             <Link
               href="/be-involved"
-              className="inline-flex items-center justify-center border-2 border-zinc-900 dark:border-white px-8 h-14 font-bold text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all text-center uppercase"
+              className="inline-flex items-center justify-center border-2 border-zinc-900 dark:border-white px-2 sm:px-8 h-14 font-bold text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all text-center uppercase"
             >
               Join the Revolution
             </Link>

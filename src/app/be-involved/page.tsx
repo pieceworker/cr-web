@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default async function BeInvolvedPage() {
   return (
-    <div className="flex flex-col gap-16 py-10 px-6 max-w-6xl mx-auto transition-colors">
+    <div className="flex flex-col gap-16 py-10 px-2 sm:px-6 max-w-6xl mx-auto transition-colors">
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic text-zinc-900 dark:text-white">
           Join The Revolution
@@ -14,7 +14,7 @@ export default async function BeInvolvedPage() {
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Musicians Section */}
-        <div className="border border-zinc-200 dark:border-zinc-800 p-10 space-y-6 bg-zinc-50 dark:bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-950 transition-all">
+        <div className="border border-zinc-200 dark:border-zinc-800 px-2 py-10 sm:p-10 space-y-6 bg-zinc-50 dark:bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-950 transition-all">
           <h2 className="text-3xl font-bold uppercase text-red-600 italic">For Musicians</h2>
           <ul className="text-zinc-600 dark:text-zinc-400 space-y-2 list-disc list-inside">
             <li>Sign up for our Musician Portal</li>
@@ -27,7 +27,7 @@ export default async function BeInvolvedPage() {
         </div>
 
         {/* Audience Section */}
-        <div className="border border-zinc-200 dark:border-zinc-800 p-10 space-y-6 bg-zinc-50 dark:bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-950 transition-all">
+        <div className="border border-zinc-200 dark:border-zinc-800 px-2 py-10 sm:p-10 space-y-6 bg-zinc-50 dark:bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-950 transition-all">
           <h2 className="text-3xl font-bold uppercase italic text-zinc-900 dark:text-white">For Audience</h2>
           <ul className="text-zinc-600 dark:text-zinc-400 space-y-2 list-disc list-inside">
             <li>Join our mailing list</li>

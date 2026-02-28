@@ -81,10 +81,8 @@ async function getAdminData() {
     };
 }
 
-// Reusable Tailwind classes for consistency
 const SECTION_HEADER = "text-2xl font-black uppercase italic tracking-tighter border-b-4 border-red-600 inline-block font-heading mb-6";
 const BUTTON_DANGER = "text-red-600 font-bold hover:underline text-xs uppercase tracking-widest";
-const SUMMARY = "cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open:bg-red-600 group-open:text-white group-open:hover:text-white transition-all";
 
 
 
@@ -96,7 +94,7 @@ export default async function AdminPage() {
     const { requests, chapters, artists, bookings, users, uploadedImages } = await getAdminData();
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-6 space-y-24">
+        <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6 space-y-24">
             <header className="space-y-2">
                 <h1 className="text-5xl md:text-7xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none">
                     Admin<br /><span className="text-red-600">Dashboard</span>
@@ -147,25 +145,29 @@ export default async function AdminPage() {
                             <div className="aspect-video relative grayscale-[0.5] hover:grayscale-0 transition-all duration-700">
                                 {c.image && <Image src={c.image} alt={c.location} fill className="object-cover" unoptimized />}
                             </div>
-                            <div className="p-6 space-y-4 flex-1 flex flex-col">
+                            <div className="px-2 py-6 sm:p-6 space-y-4 flex-1 flex flex-col">
                                 <div className="flex justify-between items-start">
                                     <h3 className="font-black text-xl uppercase italic font-heading tracking-tighter">{c.location}</h3>
                                     <form action={deleteChapter.bind(null, c.id)}>
                                         <button className={BUTTON_DANGER}>Delete</button>
                                     </form>
                                 </div>
-                                <details className="group mt-auto">
-                                    <summary className={SUMMARY}>
-                                        Edit Chapter
+                            </div>
+                            <div className="w-full mt-auto">
+                                <details className="w-full group">
+                                    <summary className="cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open:bg-red-600 group-open:text-white group-open:hover:text-white transition-all">
+                                        <span>Edit Chapter</span>
                                         <span className="group-open:rotate-180 transition-transform text-lg">▾</span>
                                     </summary>
-                                    <ChapterEditForm chapter={c} />
+                                    <div className="px-2 py-6 sm:p-6 bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <ChapterEditForm chapter={c} />
+                                    </div>
                                 </details>
                             </div>
                         </div>
                     ))}
 
-                    <div className="bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 p-8 flex flex-col justify-center items-center text-center min-h-[300px]">
+                    <div className="bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 px-2 py-8 sm:p-8 flex flex-col justify-center items-center text-center min-h-[300px]">
                         <details className="group we-full w-full">
                             <summary className="cursor-pointer list-none flex flex-col items-center gap-4 group-open:hidden">
                                 <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-3xl text-zinc-400 group-hover:bg-red-600 group-hover:text-white transition-colors">
@@ -180,28 +182,28 @@ export default async function AdminPage() {
                         </details>
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Artists */}
-            <section>
+            < section >
                 <h2 className={SECTION_HEADER}>Artists ({artists.length})</h2>
                 <div className="grid gap-6 mt-6">
                     {artists.map((a) => <ArtistCard key={a.id} a={a} requests={requests} chapters={chapters} users={users} isAdmin={true} />)}
                     {artists.length === 0 && <p className="text-zinc-500 italic py-12 text-center uppercase tracking-widest text-sm border-2 border-dashed border-zinc-200 dark:border-zinc-800">No artists registered.</p>}
                 </div>
-            </section>
+            </section >
 
             {/* Bookings */}
-            <section>
+            < section >
                 <h2 className={SECTION_HEADER}>Bookings ({bookings.length})</h2>
                 <div className="grid gap-8 mt-6">
                     {bookings.map((b) => <BookingCard key={b.id} b={b} requests={requests} isAdmin={true} />)}
                     {bookings.length === 0 && <p className="text-zinc-500 italic py-12 text-center uppercase tracking-widest text-sm border-2 border-dashed border-zinc-200 dark:border-zinc-800">No booking inquiries found.</p>}
                 </div>
-            </section>
+            </section >
 
             {/* Uploaded Images */}
-            <section>
+            < section >
                 <h2 className={SECTION_HEADER}>Uploaded Images ({uploadedImages.length})</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-6">
                     {uploadedImages.map((img) => (
@@ -231,7 +233,7 @@ export default async function AdminPage() {
                         </div>
                     )}
                 </div>
-            </section>
-        </div>
+            </section >
+        </div >
     );
 }

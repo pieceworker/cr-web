@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function AboutPage() {
   return (
-    <div className="flex flex-col gap-10 md:gap-16 py-10 px-6 max-w-6xl mx-auto overflow-x-hidden transition-colors">
+    <div className="flex flex-col gap-10 md:gap-16 py-10 px-2 sm:px-6 max-w-6xl mx-auto overflow-x-hidden transition-colors">
       {/* Header Section */}
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic underline decoration-red-600 underline-offset-8 text-zinc-900 dark:text-white">
@@ -52,7 +52,7 @@ export default function AboutPage() {
 
       {/* Global Impact Highlights */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">
-        <div className="p-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+        <div className="px-2 py-6 sm:p-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
           <h3 className="text-xl font-bold uppercase tracking-tighter text-red-600 mb-2">
             Our Mission
           </h3>
@@ -62,7 +62,7 @@ export default function AboutPage() {
             performance opportunities to local musicians.
           </p>
         </div>
-        <div className="p-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+        <div className="px-2 py-6 sm:p-6 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
           <h3 className="text-xl font-bold uppercase tracking-tighter text-red-600 mb-2">
             The Community
           </h3>

@@ -84,7 +84,7 @@ export default async function EventsPage() {
     .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
 
   return (
-    <div className="flex flex-col gap-10 py-10 px-6 max-w-6xl mx-auto transition-colors">
+    <div className="flex flex-col gap-10 py-10 px-2 sm:px-6 max-w-6xl mx-auto transition-colors">
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic text-red-600">
           Events
@@ -99,7 +99,7 @@ export default async function EventsPage() {
           filteredEvents.map((event, i) => (
             <div
               key={i}
-              className="group border border-zinc-200 dark:border-zinc-800 p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+              className="group border border-zinc-200 dark:border-zinc-800 px-2 py-6 sm:p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
             >
               <div className="flex-1">
                 <div>
@@ -120,7 +120,7 @@ export default async function EventsPage() {
                   href={event.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full md:w-auto text-center border border-zinc-900 dark:border-white px-8 py-3 font-bold uppercase text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
+                  className="w-full md:w-auto text-center border border-zinc-900 dark:border-white px-2 sm:px-8 py-3 font-bold uppercase text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
                 >
                   Get Tickets
                 </Link>

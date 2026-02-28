@@ -70,7 +70,7 @@ export default function MediaPage() {
   }, [selectedIdx, showNext, showPrev]);
 
   return (
-    <div className="flex flex-col gap-10 py-10 px-6 max-w-6xl mx-auto transition-colors">
+    <div className="flex flex-col gap-10 py-10 px-2 sm:px-6 max-w-6xl mx-auto transition-colors">
       <section className="text-center space-y-4">
         <h1 className="text-4xl md:text-6xl font-black uppercase italic text-zinc-900 dark:text-white">
           Media
@@ -99,7 +99,7 @@ export default function MediaPage() {
       {/* Lightbox Modal */}
       {selectedIdx !== null && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4 touch-none"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm px-2 py-4 sm:p-4 touch-none"
           onClick={() => setSelectedIdx(null)}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -117,7 +117,7 @@ export default function MediaPage() {
           {/* Navigation - Added bg-black/20 and rounded corners for contrast */}
           <button 
             onClick={(e) => { e.stopPropagation(); showPrev(); }} 
-            className="absolute left-2 md:left-6 text-white text-5xl md:text-6xl p-4 z-[70] bg-black/20 hover:bg-black/40 hover:text-red-600 rounded-lg transition-all"
+            className="absolute left-2 md:left-6 text-white text-5xl md:text-6xl px-2 py-4 sm:p-4 z-[70] bg-black/20 hover:bg-black/40 hover:text-red-600 rounded-lg transition-all"
             aria-label="Previous image"
           >
             &lsaquo;
@@ -140,7 +140,7 @@ export default function MediaPage() {
 
           <button 
             onClick={(e) => { e.stopPropagation(); showNext(); }} 
-            className="absolute right-2 md:right-6 text-white text-5xl md:text-6xl p-4 z-[70] bg-black/20 hover:bg-black/40 hover:text-red-600 rounded-lg transition-all"
+            className="absolute right-2 md:right-6 text-white text-5xl md:text-6xl px-2 py-4 sm:p-4 z-[70] bg-black/20 hover:bg-black/40 hover:text-red-600 rounded-lg transition-all"
             aria-label="Next image"
           >
             &rsaquo;
@@ -149,7 +149,7 @@ export default function MediaPage() {
       )}
 
       {/* Press Section */}
-      <div className="mt-10 p-10 bg-zinc-50 dark:bg-zinc-950 border-l-4 border-red-600 shadow-sm">
+      <div className="mt-10 px-2 py-10 sm:p-10 bg-zinc-50 dark:bg-zinc-950 border-l-4 border-red-600 shadow-sm">
         <h3 className="text-xl font-bold uppercase italic mb-2 text-zinc-900 dark:text-white">
           Featured Press
         </h3>

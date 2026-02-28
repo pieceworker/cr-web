@@ -61,7 +61,7 @@ export default async function ProfilePage() {
     }));
 
     return (
-        <div className="max-w-6xl mx-auto py-12 px-6">
+        <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6">
             <header className="mb-12">
                 <h1 className="text-5xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none">
                     Account<br /><span className="text-red-600">Overview</span>
@@ -71,38 +71,42 @@ export default async function ProfilePage() {
 
             <div className="space-y-12">
                 {/* Identity Card */}
-                <div className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-200 dark:border-zinc-800 space-y-6">
-                    <div className="flex items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6 mb-6">
-                        <div className="w-16 h-16 rounded-full border-2 border-red-600/20 overflow-hidden relative">
-                            {user?.image && <Image src={user.image} alt={user.name || "User"} fill className="object-cover" unoptimized />}
-                        </div>
-                        <div>
-                            <h2 className="text-2xl font-bold uppercase italic font-heading tracking-tighter">{user?.name}</h2>
-                            <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{user?.email}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                                <span className={`inline-block w-2 h-2 rounded-full ${user?.role === 'Musician' || user?.role === 'Chapter Director' ? 'bg-green-500' : 'bg-zinc-400'}`}></span>
-                                <p className="font-black uppercase tracking-widest text-[10px] text-red-600">{user?.role}</p>
+                <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-all group">
+                    <div className="px-2 py-8 sm:p-8 space-y-6">
+                        <div className="flex items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6 mb-6">
+                            <div className="w-16 h-16 rounded-full border-2 border-red-600/20 overflow-hidden relative">
+                                {user?.image && <Image src={user.image} alt={user.name || "User"} fill className="object-cover" unoptimized />}
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold uppercase italic font-heading tracking-tighter">{user?.name}</h2>
+                                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{user?.email}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <span className={`inline-block w-2 h-2 rounded-full ${user?.role === 'Musician' || user?.role === 'Chapter Director' ? 'bg-green-500' : 'bg-zinc-400'}`}></span>
+                                    <p className="font-black uppercase tracking-widest text-[10px] text-red-600">{user?.role}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <details className="group">
-                        <summary className="cursor-pointer font-black uppercase tracking-[0.2em] text-[10px] text-zinc-500 hover:text-red-600 transition-colors list-none flex items-center justify-between">
-                            <span>Manage Profile & Role</span>
-                            <span className="group-open:rotate-180 transition-transform text-lg">▾</span>
-                        </summary>
+                    <div className="w-full mt-auto">
+                        <details className="w-full group">
+                            <summary className="cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open:bg-red-600 group-open:text-white group-open:hover:text-white transition-all">
+                                <span>Manage Profile & Role</span>
+                                <span className="group-open:rotate-180 transition-transform text-lg">▾</span>
+                            </summary>
 
-                        <div className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800">
-                            {user && (
-                                <ProfileForm
-                                    user={user}
-                                    chapters={chapters}
-                                    pendingUserEdit={pendingUserEdit}
-                                    pendingRoleRequest={pendingRoleRequest}
-                                />
-                            )}
-                        </div>
-                    </details>
+                            <div className="px-2 py-8 sm:p-8 bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                                {user && (
+                                    <ProfileForm
+                                        user={user}
+                                        chapters={chapters}
+                                        pendingUserEdit={pendingUserEdit}
+                                        pendingRoleRequest={pendingRoleRequest}
+                                    />
+                                )}
+                            </div>
+                        </details>
+                    </div>
                 </div>
 
                 {(user?.role === "Musician" || user?.role === "Chapter Director") && (

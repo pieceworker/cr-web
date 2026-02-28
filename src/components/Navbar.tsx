@@ -38,7 +38,7 @@ export default async function Navbar() {
   };
 
   return (
-    <nav className="flex flex-row justify-between items-center px-4 md:px-6 py-4 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-50 transition-colors h-16 md:h-20">
+    <nav className="flex flex-row justify-between items-center px-2 sm:px-4 md:px-6 py-4 bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-50 transition-colors h-16 md:h-20">
       <div className="flex items-center gap-4 shrink-0">
         <Link
           href="/"

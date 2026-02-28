@@ -36,7 +36,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black py-12 transition-colors">
-      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+      <div className="max-w-6xl mx-auto px-2 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="space-y-2 text-center md:text-left">
           <Link
             href="/"

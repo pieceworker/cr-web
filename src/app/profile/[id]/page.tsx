@@ -40,7 +40,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
     const directorChapters = chapters.filter(c => directorChapterIds.includes(c.id));
 
     return (
-        <div className="max-w-6xl mx-auto py-20 px-6">
+        <div className="max-w-6xl mx-auto py-20 px-2 sm:px-6">
             <div className="flex flex-col md:flex-row gap-12 items-center md:items-start text-center md:text-left">
                 <div className="w-48 h-48 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-4 border-red-600 shrink-0 relative">
                     {user.image && <Image src={user.image} alt={user.name ?? "Member"} fill className="object-cover" unoptimized />}
@@ -93,7 +93,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
                         </div>
                     )}
 
-                    <div className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-200 dark:border-zinc-800 text-left">
+                    <div className="bg-zinc-50 dark:bg-zinc-900 px-2 py-8 sm:p-8 border border-zinc-200 dark:border-zinc-800 text-left">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-3 block">About</h3>
                         {user.bio ? (
                             <p className="text-zinc-600 dark:text-zinc-400 italic leading-relaxed whitespace-pre-wrap">

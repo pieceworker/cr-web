@@ -32,7 +32,7 @@ export default async function BookingProfilePage({ params }: { params: Promise<{
     const displayImage = booking.image_preference === 'google' ? creator?.image : booking.image;
 
     return (
-        <div className="max-w-6xl mx-auto py-20 px-6 space-y-12">
+        <div className="max-w-6xl mx-auto py-20 px-2 sm:px-6 space-y-12">
             <div className="flex flex-col md:flex-row gap-12 items-center md:items-start text-center md:text-left">
                 {/* Booking Image */}
                 <div className="relative group">
@@ -79,7 +79,7 @@ export default async function BookingProfilePage({ params }: { params: Promise<{
                             <h2 className="text-xl font-bold uppercase tracking-tight border-l-4 border-red-600 pl-4 font-heading">Events ({dates.length})</h2>
                             <div className="grid sm:grid-cols-2 gap-4">
                                 {dates.map((date) => (
-                                    <div key={date.id} className="bg-zinc-50 dark:bg-zinc-900 p-6 border border-zinc-200 dark:border-zinc-800 space-y-4">
+                                    <div key={date.id} className="bg-zinc-50 dark:bg-zinc-900 px-2 py-6 sm:p-6 border border-zinc-200 dark:border-zinc-800 space-y-4">
                                         <div className="space-y-1">
                                             <p className="font-black text-xl uppercase italic text-red-600 leading-none">{date.date}</p>
                                             <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">{date.time} {date.duration ? `(${date.duration})` : ''}</p>

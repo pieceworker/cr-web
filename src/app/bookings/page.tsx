@@ -59,8 +59,8 @@ export default async function BookingsPage() {
                     <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-[2px] h-full pointer-events-auto" />
 
                     {/* Sticky viewport-centered modal */}
-                    <div className="sticky top-0 h-[100dvh] flex items-center justify-center p-6">
-                        <div className="relative bg-white dark:bg-zinc-900 border-4 border-red-600 p-12 text-center space-y-6 shadow-2xl max-w-lg w-full pointer-events-auto">
+                    <div className="sticky top-0 h-[100dvh] flex items-center justify-center px-2 py-6 sm:p-6">
+                        <div className="relative bg-white dark:bg-zinc-900 border-4 border-red-600 px-2 py-12 sm:p-12 text-center space-y-6 shadow-2xl max-w-lg w-full pointer-events-auto">
                             <div className="w-20 h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
                                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -83,7 +83,7 @@ export default async function BookingsPage() {
                             >
                                 <button
                                     type="submit"
-                                    className="w-full bg-red-600 text-white font-bold uppercase py-4 px-8 hover:bg-red-700 transition-all tracking-[0.2em] text-sm active:scale-[0.98] shadow-lg shadow-red-600/20"
+                                    className="w-full bg-red-600 text-white font-bold uppercase py-4 px-2 sm:px-8 hover:bg-red-700 transition-all tracking-[0.2em] text-sm active:scale-[0.98] shadow-lg shadow-red-600/20"
                                 >
                                     Sign in with Google
                                 </button>
@@ -93,7 +93,7 @@ export default async function BookingsPage() {
                 </div>
             )}
 
-            <div className={`col-start-1 row-start-1 py-12 px-6 space-y-16 transition-all duration-700 ${!isAuthenticated ? 'blur-[1px] grayscale-[0.5]' : ''}`}>
+            <div className={`col-start-1 row-start-1 py-12 px-2 sm:px-6 space-y-16 transition-all duration-700 ${!isAuthenticated ? 'blur-[1px] grayscale-[0.5]' : ''}`}>
                 <section className="space-y-8">
                     <div className="space-y-2">
                         <h1 className="text-5xl md:text-7xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none tracking-tighter">

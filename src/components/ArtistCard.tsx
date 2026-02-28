@@ -5,7 +5,7 @@ import { Artist, UnifiedRequest, Chapter, User } from "@/lib/db";
 import { deleteArtist, updateArtist } from "@/lib/actions";
 import ArtistForm from "@/components/ArtistForm";
 
-const BUTTON_SECONDARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-6 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all text-xs tracking-widest active:scale-[0.98]";
+const BUTTON_SECONDARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-2 sm:px-6 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all text-xs tracking-widest active:scale-[0.98]";
 const SUMMARY = "cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open:bg-red-600 group-open:text-white group-open:hover:text-white transition-all";
 
 interface ArtistCardProps {
@@ -48,7 +48,7 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
 
     return (
         <div className={`bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col transition-all ${isPending && !isAdmin ? 'opacity-75 grayscale-[0.2]' : ''}`}>
-            <div className="p-8 flex flex-col md:flex-row gap-8 items-start">
+            <div className="px-2 py-8 sm:p-8 flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-32 h-32 bg-zinc-200 dark:bg-zinc-800 border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
                     {displayImage && <Image src={displayImage} alt={displayArtist.name} fill className="object-cover" unoptimized />}
                 </div>
@@ -108,7 +108,7 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
 
             <div className={`w-full ${(pendingAdd || pendingEdit) && !isAdmin ? 'pointer-events-none' : ''}`}>
                 {pendingEdit && (
-                    <div className="p-8 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
+                    <div className="px-2 py-8 sm:p-8 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 mb-6 italic">Pending Artist Edit Request</h4>
                         <ArtistForm
                             artist={mergedArtist}
@@ -122,7 +122,7 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
                     </div>
                 )}
                 {pendingAdd && (
-                    <div className="p-8 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
+                    <div className="px-2 py-8 sm:p-8 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 mb-6 italic">Pending New Artist Approval</h4>
                         <ArtistForm
                             artist={mergedArtist}
@@ -141,7 +141,7 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
                             <span>Edit Artist</span>
                             <span className="group-open:rotate-180 transition-transform text-lg">▾</span>
                         </summary>
-                        <div className="p-8 bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="px-2 py-8 sm:p-8 bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-4 duration-300">
                             <ArtistForm
                                 artist={mergedArtist}
                                 chapters={chapters}
