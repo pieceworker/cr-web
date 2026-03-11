@@ -64,16 +64,16 @@ export default function NavUserMenu({ session, navItems, signOutAction, signInAc
 
             {/* Dropdown Menu */}
             {isOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 shadow-2xl z-[60] py-3 animate-in fade-in slide-in-from-top-2 duration-200 scale-95 origin-top-right">
+                <div className="absolute right-0 top-full mt-2 w-[280px] sm:w-[320px] max-h-[calc(100vh-5rem)] overflow-y-auto bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 shadow-2xl z-[60] py-4 animate-in fade-in slide-in-from-top-2 duration-200 scale-95 origin-top-right">
                     {/* Navigation Items - Unified for everyone */}
-                    <div className="border-b border-zinc-100 dark:border-zinc-900 pb-3 mb-3">
-                        <p className="px-2 sm:px-5 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Navigation</p>
+                    <div className="border-b border-zinc-100 dark:border-zinc-900 pb-4 mb-4">
+                        <p className="px-4 sm:px-6 mb-3 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Navigation</p>
                         {navItems.map((item) => (
                             <Link
                                 key={item.path}
                                 href={item.path}
                                 onClick={() => setIsOpen(false)}
-                                className="block px-2 sm:px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                                className="block px-4 sm:px-6 py-3 text-sm sm:text-base font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
                             >
                                 {item.name}
                             </Link>
@@ -82,13 +82,13 @@ export default function NavUserMenu({ session, navItems, signOutAction, signInAc
 
                     {/* Account actions */}
                     <div>
-                        <p className="px-2 sm:px-5 mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">{session ? 'Account' : 'Login'}</p>
+                        <p className="px-4 sm:px-6 mb-3 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-zinc-400">{session ? 'Account' : 'Login'}</p>
                         {session ? (
                             <>
                                 <Link
                                     href="/account"
                                     onClick={() => setIsOpen(false)}
-                                    className="block px-2 sm:px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                                    className="block px-4 sm:px-6 py-3 text-sm sm:text-base font-bold uppercase tracking-widest text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
                                 >
                                     My Profile & Settings
                                 </Link>
@@ -97,7 +97,7 @@ export default function NavUserMenu({ session, navItems, signOutAction, signInAc
                                         setIsOpen(false);
                                         await signOutAction();
                                     }}
-                                    className="block w-full text-left px-2 sm:px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                                    className="block w-full text-left px-4 sm:px-6 py-3 text-sm sm:text-base font-bold uppercase tracking-widest text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
                                 >
                                     Log Out
                                 </button>
@@ -108,7 +108,7 @@ export default function NavUserMenu({ session, navItems, signOutAction, signInAc
                                     setIsOpen(false);
                                     await signInAction();
                                 }}
-                                className="block w-full text-left px-2 sm:px-5 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-red-600 hover:bg-red-700 transition-colors"
+                                className="block w-full text-left px-4 sm:px-6 py-3 text-sm sm:text-base font-bold uppercase tracking-widest text-white bg-red-600 hover:bg-red-700 transition-colors"
                             >
                                 Sign in with Google
                             </button>
