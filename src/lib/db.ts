@@ -59,6 +59,16 @@ export interface BookingDate {
     is_public: boolean;
 }
 
+export interface BlogPost {
+    id: string;
+    title: string;
+    body: string;
+    author_id: string;
+    image: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
 export type RequestType = "ROLE_CHANGE" | "USER_EDIT" | "ARTIST_EDIT" | "ARTIST_ADD" | "BOOKING_INQUIRY" | "BOOKING_EDIT";
 
 export interface UnifiedRequest {
@@ -74,17 +84,6 @@ export interface UnifiedRequest {
     user_email?: string;
 }
 
-export interface RoleRequest {
-    id: string;
-    user_id: string;
-    requested_role: Role;
-    location: string | null;
-    bio: string | null;
-    image: string | null;
-    status: "PENDING" | "APPROVED" | "REJECTED";
-    user_name?: string;
-    user_email?: string;
-}
 
 export function isAdmin(email?: string | null): boolean {
     if (!email) return false;

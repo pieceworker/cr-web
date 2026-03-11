@@ -5,6 +5,7 @@ import Link from "next/link";
 import { User, UnifiedRequest, Chapter } from "@/lib/db";
 import { deleteUser, updateUser } from "@/lib/actions";
 import ProfileForm from "@/components/ProfileForm";
+import DiffViewer from "./DiffViewer";
 
 const BUTTON_DANGER = "text-zinc-400 hover:text-red-600 font-bold uppercase text-[10px] tracking-widest transition-colors";
 
@@ -74,6 +75,9 @@ export default function UserCard({ u, requests, chapters, isAdmin = false }: Use
                 {pendingUserEdit && (
                     <div className="px-2 py-6 sm:p-6 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 mb-4 italic">Pending Profile Edit Request</h4>
+                        <div className="mb-8">
+                            <DiffViewer original={u as unknown as Record<string, unknown>} proposed={mergedUser as unknown as Record<string, unknown>} chapters={chapters} />
+                        </div>
                         <ProfileForm
                             user={mergedUser}
                             chapters={chapters}
@@ -87,6 +91,9 @@ export default function UserCard({ u, requests, chapters, isAdmin = false }: Use
                 {pendingRoleRequest && !pendingUserEdit && (
                     <div className="px-2 py-6 sm:p-6 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 mb-4 italic">Pending Role Change Request</h4>
+                        <div className="mb-8">
+                            <DiffViewer original={u as unknown as Record<string, unknown>} proposed={mergedUser as unknown as Record<string, unknown>} chapters={chapters} />
+                        </div>
                         <ProfileForm
                             user={mergedUser}
                             chapters={chapters}

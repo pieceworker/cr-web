@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Booking, BookingDate, UnifiedRequest } from "@/lib/db";
 import { deleteBooking, toggleBookingDatePublic } from "@/lib/actions";
 import BookingForm from "@/components/BookingForm";
+import DiffViewer from "./DiffViewer";
 
 const BUTTON_SECONDARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-2 sm:px-6 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all text-xs tracking-widest active:scale-[0.98]";
 
@@ -114,6 +115,9 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
                 {pendingEdit && (
                     <div className="px-2 py-6 sm:p-6 border-t-4 border-red-600 bg-red-50 dark:bg-red-900/10">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 mb-4 italic">Pending Booking Edit Request</h4>
+                        <div className="mb-8">
+                            <DiffViewer original={b as unknown as Record<string, unknown>} proposed={JSON.parse(pendingEdit.data || '{}')} />
+                        </div>
                         <BookingForm booking={b} pendingEdit={pendingEdit} isAdmin={isAdmin} reviewRequestId={isAdmin ? pendingEdit.id : undefined} />
                     </div>
                 )}

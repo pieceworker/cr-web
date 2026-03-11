@@ -11,6 +11,7 @@ export default async function Navbar() {
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events' },
     { name: 'Bookings', path: '/bookings' },
+    { name: 'Blog', path: '/blog' },
     { name: 'Chapters', path: '/chapters' },
     { name: 'Directors', path: '/chapterdirectors' },
     { name: 'Artists', path: '/artists' },

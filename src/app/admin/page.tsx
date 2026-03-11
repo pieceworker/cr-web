@@ -1,9 +1,9 @@
 import { auth } from "@/auth";
 import Link from "next/link";
-import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest } from "@/lib/db";
+import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest, BlogPost } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { deleteChapter } from "@/lib/actions";
+import { deleteChapter, deleteBlogPost } from "@/lib/actions";
 import Image from "next/image";
 import ChapterEditForm from "@/components/ChapterEditForm";
 import UserCard from "@/components/UserCard";
@@ -48,6 +48,9 @@ async function getAdminData() {
     const usersResult = await db.prepare("SELECT * FROM users").all();
     const users = usersResult.results as unknown as User[];
 
+    const blogPostsRes = await db.prepare("SELECT * FROM blog_posts ORDER BY created_at DESC").all();
+    const blogPosts = blogPostsRes.results as unknown as BlogPost[];
+
     // Fetch all artists, bookings, and chapters to match R2 images against
     const allArtists = artists.results as unknown as Artist[];
     const allBookings = bookingsRes.results as unknown as Booking[];
@@ -62,12 +65,13 @@ async function getAdminData() {
         const artist = allArtists.find(a => a.image === url);
         const booking = allBookings.find(b => b.image === url);
         const chapter = allChapters.find(c => c.image === url);
+        const blogPost = blogPosts.find(p => p.image === url);
 
         return {
-            id: artist?.id || booking?.id || chapter?.id || obj.key,
-            name: artist?.name || booking?.name || chapter?.location || obj.key,
+            id: artist?.id || booking?.id || chapter?.id || blogPost?.id || obj.key,
+            name: artist?.name || booking?.name || chapter?.location || blogPost?.title || obj.key,
             image: url,
-            type: artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : 'unlinked'))
+            type: artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : 'unlinked')))
         };
     });
 
@@ -76,6 +80,7 @@ async function getAdminData() {
         chapters: (chapters.results as unknown as Chapter[] || []),
         artists: allArtists,
         bookings: bookingsWithDates,
+        blogPosts,
         users,
         uploadedImages
     };
@@ -91,7 +96,7 @@ export default async function AdminPage() {
     const session = await auth();
     if (!isAdmin(session?.user?.email)) redirect("/");
 
-    const { requests, chapters, artists, bookings, users, uploadedImages } = await getAdminData();
+    const { requests, chapters, artists, bookings, users, blogPosts, uploadedImages } = await getAdminData();
 
     return (
         <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6 space-y-24">
@@ -105,7 +110,7 @@ export default async function AdminPage() {
             {/* Unified Requests */}
             <section>
                 <div className="flex justify-between items-end mb-6">
-                    <h2 className={SECTION_HEADER}>Requests ({requests.length})</h2>
+                    <h2 className={SECTION_HEADER}>Pending ({requests.length})</h2>
                 </div>
                 <div className="grid gap-8">
                     {requests.map((req) => {
@@ -202,8 +207,47 @@ export default async function AdminPage() {
                 </div>
             </section >
 
+            {/* Blog Posts */}
+            <section>
+                <div className="flex justify-between items-end mb-6">
+                    <h2 className={SECTION_HEADER}>Blog Posts ({blogPosts.length})</h2>
+                    <Link href="/blog/new" className="text-[10px] font-black uppercase tracking-[0.2em] bg-red-600 text-white px-4 py-2 hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all">
+                        Write New Post
+                    </Link>
+                </div>
+                <div className="grid gap-4">
+                    {blogPosts.map(post => {
+                        const author = users.find(u => u.id === post.author_id);
+                        return (
+                            <div key={post.id} className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 flex justify-between items-center group hover:border-red-600 transition-colors">
+                                <div className="flex items-center gap-4">
+                                    {post.image && (
+                                        <div className="w-12 h-12 relative overflow-hidden bg-zinc-200 dark:bg-zinc-800">
+                                            <Image src={post.image} alt="Thumbnail" fill className="object-cover grayscale-[0.5] group-hover:grayscale-0" unoptimized />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <Link href={`/blog/${post.id}`} className="hover:underline hover:text-red-600">
+                                            <h3 className="font-bold text-lg leading-tight truncate max-w-[300px] sm:max-w-[500px]">{post.title}</h3>
+                                        </Link>
+                                        <p className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest">
+                                            By {author?.name || 'Unknown'} • {new Date(post.created_at).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <form action={deleteBlogPost.bind(null, post.id)}>
+                                    <button className={BUTTON_DANGER}>Delete</button>
+                                </form>
+                            </div>
+                        );
+                    })}
+                    {blogPosts.length === 0 && <p className="text-zinc-500 italic py-12 text-center uppercase tracking-widest text-sm border-2 border-dashed border-zinc-200 dark:border-zinc-800">No blog posts found.</p>}
+                </div>
+            </section>
+
             {/* Uploaded Images */}
-            < section >
+            <section>
                 <h2 className={SECTION_HEADER}>Uploaded Images ({uploadedImages.length})</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-6">
                     {uploadedImages.map((img) => (
@@ -212,7 +256,7 @@ export default async function AdminPage() {
                             className="group block bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-2 hover:border-red-600 transition-all shadow-sm"
                         >
                             <Link
-                                href={img.type === 'unlinked' ? img.image : (img.type === 'artist' ? `/artists/${img.id}` : (img.type === 'chapter' ? `/chapters/${img.id}` : `/bookings/${img.id}`))}
+                                href={img.type === 'unlinked' ? img.image : (img.type === 'artist' ? `/artists/${img.id}` : (img.type === 'chapter' ? `/chapters/${img.id}` : (img.type === 'blog_post' ? `/blog/${img.id}` : `/bookings/${img.id}`)))}
                                 target={img.type === 'unlinked' ? "_blank" : undefined}
                             >
                                 <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden">

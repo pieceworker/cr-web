@@ -1,7 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { BlogPost } from "@/lib/db";
+import ReactMarkdown from 'react-markdown';
 
-export default function Home() {
+
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const { env } = await getCloudflareContext();
+  const db = env.DB;
+  
+  const latestPostRes = await db.prepare("SELECT * FROM blog_posts ORDER BY created_at DESC LIMIT 1").first();
+  const latestPost = latestPostRes as unknown as BlogPost | null;
+
   return (
     <div className="flex flex-col gap-10 md:gap-16 py-10 px-2 sm:px-6 max-w-6xl mx-auto overflow-x-hidden transition-colors">
       {/* Hero Section */}
@@ -44,6 +56,46 @@ export default function Home() {
           />
         </div>
       </section>
+
+      {/* The Latest Revolution Diary */}
+      {latestPost && (
+        <section className="border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">
+          <div className="flex justify-between items-end mb-8">
+            <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter font-heading text-zinc-900 dark:text-white">
+              The <span className="text-red-600">Revolution</span><br/>Diaries
+            </h2>
+            <Link href="/blog" className="text-xs font-bold uppercase tracking-widest hover:text-red-600 transition-colors border-b-2 border-transparent hover:border-red-600">
+              Read All Entries ↗
+            </Link>
+          </div>
+          
+          <div className="group relative border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex flex-col md:flex-row shadow-sm hover:border-red-600 transition-all duration-300">
+            {latestPost.image && (
+                <div className="w-full md:w-1/2 lg:w-1/3 aspect-video relative grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700 border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-800">
+                    <Image src={latestPost.image} alt={latestPost.title} fill className="object-cover" unoptimized />
+                </div>
+            )}
+            <div className="flex-1 p-6 sm:p-10 flex flex-col">
+              <div className="flex gap-4 items-center mb-6">
+                <span className="text-[10px] font-black uppercase tracking-widest bg-red-600 text-white px-3 py-1">LATEST POST</span>
+                <span className="text-[10px] uppercase font-bold text-zinc-400">{new Date(latestPost.created_at).toLocaleDateString()}</span>
+              </div>
+              <Link href={`/blog/${latestPost.id}`} className="group-hover:text-red-600 transition-colors">
+                  <h3 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter mb-4 leading-none">{latestPost.title}</h3>
+              </Link>
+              <div className="prose prose-zinc dark:prose-invert prose-sm line-clamp-3 italic mb-8 prose-headings:text-base prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-headings:italic prose-headings:font-heading prose-a:hidden prose-img:hidden">
+                  <ReactMarkdown>{latestPost.body}</ReactMarkdown>
+              </div>
+              <Link 
+                  href={`/blog/${latestPost.id}`} 
+                  className="inline-block text-xs font-black uppercase tracking-[0.2em] text-zinc-900 dark:text-white border-b-2 border-transparent hover:border-red-600 mt-auto transition-all w-fit"
+              >
+                  Read The Entry ↗
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Mission Highlights */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">

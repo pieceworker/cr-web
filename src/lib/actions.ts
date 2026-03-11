@@ -862,3 +862,80 @@ export async function updateBooking(formData: FormData) {
     revalidatePath("/bookings");
     revalidatePath("/admin");
 }
+
+// Blog Posts CRUD
+export async function createBlogPost(formData: FormData) {
+    const session = await auth();
+    const userRole = (session?.user as { role?: string })?.role;
+    if (!isAdmin(session?.user?.email) && userRole !== 'Chapter Director') {
+        throw new Error("Unauthorized");
+    }
+
+    const title = formData.get("title") as string;
+    const body = formData.get("body") as string;
+    const image = formData.get("image") as string;
+
+    const db = await getDB();
+    await db.prepare(
+        "INSERT INTO blog_posts (id, title, body, author_id, image) VALUES (?, ?, ?, ?, ?)"
+    ).bind(crypto.randomUUID(), title, body, session?.user?.id, image || null).run();
+
+    revalidatePath("/blog");
+    revalidatePath("/admin");
+    revalidatePath("/");
+}
+
+export async function updateBlogPost(formData: FormData) {
+    const session = await auth();
+    const id = formData.get("id") as string;
+    const title = formData.get("title") as string;
+    const body = formData.get("body") as string;
+    const image = formData.get("image") as string;
+
+    const db = await getDB();
+    
+    // Check permission
+    const post = await db.prepare("SELECT author_id, image FROM blog_posts WHERE id = ?").bind(id).first() as { author_id: string; image: string | null } | null;
+    if (!post) throw new Error("Post not found");
+    
+    if (!isAdmin(session?.user?.email) && session?.user?.id !== post.author_id) {
+        throw new Error("Unauthorized");
+    }
+
+    if (post.image && post.image !== image && image) {
+        // We aren't deleting the old image yet to be safe, or we can
+        await deleteR2Image(post.image);
+    }
+
+    await db.prepare(
+        "UPDATE blog_posts SET title = ?, body = ?, image = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    ).bind(title, body, image || null, id).run();
+
+    revalidatePath("/blog");
+    revalidatePath(`/blog/${id}`);
+    revalidatePath("/admin");
+    revalidatePath("/");
+}
+
+export async function deleteBlogPost(id: string) {
+    const session = await auth();
+    const db = await getDB();
+    
+    // Check permission
+    const post = await db.prepare("SELECT author_id, image FROM blog_posts WHERE id = ?").bind(id).first() as { author_id: string; image: string | null } | null;
+    if (!post) throw new Error("Post not found");
+    
+    if (!isAdmin(session?.user?.email) && session?.user?.id !== post.author_id) {
+        throw new Error("Unauthorized");
+    }
+
+    await db.prepare("DELETE FROM blog_posts WHERE id = ?").bind(id).run();
+    
+    if (post.image) {
+        await deleteR2Image(post.image);
+    }
+
+    revalidatePath("/blog");
+    revalidatePath("/admin");
+    revalidatePath("/");
+}
