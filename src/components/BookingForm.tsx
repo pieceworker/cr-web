@@ -11,7 +11,7 @@ interface BookingFormProps {
     pendingEdit?: UnifiedRequest;
     isAdmin?: boolean;
     onClose?: () => void;
-    initialUserData?: { name?: string | null; email?: string | null };
+    initialUserData?: { name?: string | null; email?: string | null; image?: string | null };
     reviewRequestId?: string; // Add this
 }
 
@@ -72,7 +72,7 @@ export default function BookingForm({
     const [email, setEmail] = useState(pendingData?.email ?? booking?.email ?? initialUserData?.email ?? '');
     const [phone, setPhone] = useState(pendingData?.phone ?? booking?.phone ?? '');
     const [questions, setQuestions] = useState(pendingData?.questions ?? booking?.questions ?? '');
-    const [imagePreference, setImagePreference] = useState<'custom' | 'google'>(pendingData?.image_preference ?? booking?.image_preference ?? 'custom');
+    const [imagePreference, setImagePreference] = useState<'custom' | 'google'>(pendingData?.image_preference ?? booking?.image_preference ?? 'google');
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -381,16 +381,16 @@ export default function BookingForm({
                                     <p className="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">Google Profile Photo</p>
                                     <div className="w-24 h-24 rounded-full border-2 border-red-600 overflow-hidden relative">
                                         {/* Since we don't always have initialUserData here, we might need to show a placeholder or fetch it */}
-                                        {(booking as Booking & { user_image?: string; user?: { image?: string } })?.user_image || (booking as Booking & { user_image?: string; user?: { image?: string } })?.user?.image ? (
+                                        {((booking as Booking & { user_image?: string; user?: { image?: string } })?.user_image || (booking as Booking & { user_image?: string; user?: { image?: string } })?.user?.image || initialUserData?.image) ? (
                                             <Image
-                                                src={(booking as Booking & { user_image?: string; user?: { image?: string } })?.user_image || (booking as Booking & { user_image?: string; user?: { image?: string } })?.user?.image || ""}
+                                                src={((booking as Booking & { user_image?: string; user?: { image?: string } })?.user_image || (booking as Booking & { user_image?: string; user?: { image?: string } })?.user?.image || initialUserData?.image) || ""}
                                                 alt="Google Photo"
                                                 fill
                                                 className="object-cover"
                                                 unoptimized
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400 text-[10px] font-bold uppercase">No Photo</div>
+                                            <div className="w-full h-full flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 text-zinc-400 text-[10px] font-bold uppercase text-center">No Photo</div>
                                         )}
                                     </div>
                                     <p className="text-[10px] text-zinc-500 italic">Using your default photo from Google Login.</p>
