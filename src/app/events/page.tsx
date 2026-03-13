@@ -90,7 +90,7 @@ export default async function EventsPage() {
           Events
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 italic">
-          &ldquo;Classical music in neighborhood hangouts.&rdquo;
+          &ldquo;Chamber music in neighborhood hangouts.&rdquo;
         </p>
       </section>
 
