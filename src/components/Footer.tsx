@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Script from 'next/script';
 
 export default function Footer() {
   const socials = [
@@ -75,6 +76,9 @@ export default function Footer() {
           </p>
         </div>
       </div>
+      <Script id="mcjs" strategy="lazyOnload">
+        {`!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/a3476f0ba3a89ad4a4df5c773/94a427965d347195db66a44ed.js");`}
+      </Script>
     </footer>
   );
 }
