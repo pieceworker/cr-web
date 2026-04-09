@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { BlogPost } from "@/lib/db";
 import ReactMarkdown from 'react-markdown';
@@ -96,6 +97,21 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* Audience Section / Newsletter */}
+      <section className="border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">
+        <div className="border border-zinc-200 dark:border-zinc-800 px-2 py-10 sm:p-10 space-y-6 bg-zinc-50 dark:bg-transparent max-w-2xl mx-auto text-center hover:bg-zinc-100 dark:hover:bg-zinc-950 transition-all flex flex-col items-center justify-center">
+          <h2 className="text-3xl lg:text-5xl font-black uppercase italic text-zinc-900 dark:text-white">For <span className="text-red-600">Audience</span></h2>
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Join our mailing list to receive updates on upcoming events, volunteer opportunities, and house concerts.
+          </p>
+          <div className="w-full mt-4">
+            <Script id="mcjs-home" strategy="lazyOnload">
+              {`!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/a3476f0ba3a89ad4a4df5c773/94a427965d347195db66a44ed.js");`}
+            </Script>
+          </div>
+        </div>
+      </section>
 
       {/* Mission Highlights */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Script from "next/script";
 
 export default async function BeInvolvedPage() {
   return (
@@ -34,13 +34,11 @@ export default async function BeInvolvedPage() {
             <li>Volunteer for local chapters</li>
             <li>Host a house concert</li>
           </ul>
-          <Link
-            href="https://classicalrevolution.us9.list-manage.com/subscribe?u=3e5353da963c5e496f214dfb3&id=dc8a03f7ba"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-center w-full border-2 border-zinc-900 dark:border-white text-zinc-900 dark:text-white font-black py-4 uppercase tracking-tighter hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all">
-            Get Updates
-          </Link>
+          <div className="w-full mt-4">
+            <Script id="mcjs" strategy="lazyOnload">
+              {`!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/a3476f0ba3a89ad4a4df5c773/94a427965d347195db66a44ed.js");`}
+            </Script>
+          </div>
         </div>
       </div>
     </div>
