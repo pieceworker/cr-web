@@ -25,3 +25,15 @@ body {
 	color: var(--foreground);
 	font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Mailchimp Mobile Popup Display Fix:
+   Tailwind's preflight forces `iframe { height: auto; }` which collapses
+   Mailchimp's mobile banner popup iframe into a thin white script.
+   This override brings back the intended height calculation from Mailchimp. */
+iframe[src*="mailchimp"], 
+iframe[name*="mc"],
+.mc-modal iframe,
+div[data-dojo-attach-point] iframe {
+	height: initial !important;
+	max-height: none !important;
+}
