@@ -44,6 +44,9 @@ export default async function RootLayout({
 
 	return (
 		<html lang="en">
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: `!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/a3476f0ba3a89ad4a4df5c773/94a427965d347195db66a44ed.js");` }} />
+			</head>
 			<body className={`${inter.className} antialiased bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col transition-colors`}>
 				<Navbar />
 				<main className="w-full flex-grow grid grid-cols-1 grid-rows-1">
