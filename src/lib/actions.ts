@@ -939,3 +939,73 @@ export async function deleteBlogPost(id: string) {
     revalidatePath("/admin");
     revalidatePath("/");
 }
+
+// Events CRUD
+export async function createEvent(formData: FormData) {
+    const session = await auth();
+    if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
+
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const venue = formData.get("venue") as string;
+    const city = formData.get("city") as string;
+    const date = formData.get("date") as string;
+    const time = formData.get("time") as string;
+    const link = formData.get("link") as string;
+    const image = formData.get("image") as string;
+
+    const db = await getDB();
+    await db.prepare(
+        "INSERT INTO events (id, title, description, venue, city, date, time, link, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    ).bind(crypto.randomUUID(), title, description || null, venue, city || null, date, time, link || null, image || null).run();
+
+    revalidatePath("/events");
+    revalidatePath("/admin");
+}
+
+export async function updateEvent(formData: FormData) {
+    const session = await auth();
+    if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
+
+    const id = formData.get("id") as string;
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const venue = formData.get("venue") as string;
+    const city = formData.get("city") as string;
+    const date = formData.get("date") as string;
+    const time = formData.get("time") as string;
+    const link = formData.get("link") as string;
+    const image = formData.get("image") as string;
+
+    const db = await getDB();
+    const event = await db.prepare("SELECT image FROM events WHERE id = ?").bind(id).first() as { image: string | null } | null;
+    
+    if (event?.image && event.image !== image) {
+        await deleteR2Image(event.image);
+    }
+
+    await db.prepare(
+        "UPDATE events SET title = ?, description = ?, venue = ?, city = ?, date = ?, time = ?, link = ?, image = ? WHERE id = ?"
+    ).bind(title, description || null, venue, city || null, date, time, link || null, image || null, id).run();
+
+    revalidatePath("/events");
+    revalidatePath("/admin");
+}
+
+export async function deleteEvent(id: string) {
+    const session = await auth();
+    if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
+
+    const db = await getDB();
+    const event = await db.prepare("SELECT image FROM events WHERE id = ?").bind(id).first() as { image: string | null } | null;
+
+    await db.prepare("DELETE FROM events WHERE id = ?").bind(id).run();
+
+    if (event?.image) {
+        await deleteR2Image(event.image);
+    }
+
+    revalidatePath("/events");
+    revalidatePath("/admin");
+}
+

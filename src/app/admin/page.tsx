@@ -1,15 +1,16 @@
 import { auth } from "@/auth";
 import Link from "next/link";
-import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest, BlogPost } from "@/lib/db";
+import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest, BlogPost, Event } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { deleteChapter, deleteBlogPost } from "@/lib/actions";
+import { deleteChapter, deleteBlogPost, deleteEvent } from "@/lib/actions";
 import Image from "next/image";
 import ChapterEditForm from "@/components/ChapterEditForm";
 import UserCard from "@/components/UserCard";
 import ArtistCard from "@/components/ArtistCard";
 import BookingCard from "@/components/BookingCard";
 import NewChapterForm from "@/components/NewChapterForm";
+import EventForm from "@/components/EventForm";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,9 @@ async function getAdminData() {
     const blogPostsRes = await db.prepare("SELECT * FROM blog_posts ORDER BY created_at DESC").all();
     const blogPosts = blogPostsRes.results as unknown as BlogPost[];
 
+    const eventsRes = await db.prepare("SELECT * FROM events ORDER BY date ASC").all();
+    const events = eventsRes.results as unknown as Event[];
+
     // Fetch all artists, bookings, and chapters to match R2 images against
     const allArtists = artists.results as unknown as Artist[];
     const allBookings = bookingsRes.results as unknown as Booking[];
@@ -66,12 +70,13 @@ async function getAdminData() {
         const booking = allBookings.find(b => b.image === url);
         const chapter = allChapters.find(c => c.image === url);
         const blogPost = blogPosts.find(p => p.image === url);
+        const event = events.find(e => e.image === url);
 
         return {
-            id: artist?.id || booking?.id || chapter?.id || blogPost?.id || obj.key,
-            name: artist?.name || booking?.name || chapter?.location || blogPost?.title || obj.key,
+            id: artist?.id || booking?.id || chapter?.id || blogPost?.id || event?.id || obj.key,
+            name: artist?.name || booking?.name || chapter?.location || blogPost?.title || event?.title || obj.key,
             image: url,
-            type: artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : 'unlinked')))
+            type: artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : (event ? 'event' : 'unlinked'))))
         };
     });
 
@@ -81,6 +86,7 @@ async function getAdminData() {
         artists: allArtists,
         bookings: bookingsWithDates,
         blogPosts,
+        events,
         users,
         uploadedImages
     };
@@ -96,7 +102,7 @@ export default async function AdminPage() {
     const session = await auth();
     if (!isAdmin(session?.user?.email)) redirect("/");
 
-    const { requests, chapters, artists, bookings, users, blogPosts, uploadedImages } = await getAdminData();
+    const { requests, chapters, artists, bookings, users, blogPosts, events, uploadedImages } = await getAdminData();
 
     return (
         <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6 space-y-24">
@@ -206,6 +212,58 @@ export default async function AdminPage() {
                     {bookings.length === 0 && <p className="text-zinc-500 italic py-12 text-center uppercase tracking-widest text-sm border-2 border-dashed border-zinc-200 dark:border-zinc-800">No booking inquiries found.</p>}
                 </div>
             </section >
+
+            {/* Events */}
+            <section>
+                <h2 className={`${SECTION_HEADER} mb-8`}>Events ({events.length})</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {events.map(e => (
+                        <div key={e.id} className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800/50 group">
+                            <div className="aspect-video relative grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700">
+                                {e.image && <Image src={e.image} alt={e.title} fill className="object-cover" unoptimized />}
+                            </div>
+                            <div className="px-2 py-6 sm:p-6 space-y-4 flex-1 flex flex-col">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <div className="text-red-600 font-bold uppercase text-[10px] tracking-widest">{e.date} • {e.time}</div>
+                                        <h3 className="font-black text-xl uppercase italic font-heading tracking-tighter">{e.title}</h3>
+                                        <p className="text-xs text-zinc-500 font-medium">{e.venue}{e.city ? `, ${e.city}` : ""}</p>
+                                    </div>
+                                    <form action={deleteEvent.bind(null, e.id)}>
+                                        <button className={BUTTON_DANGER}>Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div className="w-full mt-auto">
+                                <details className="w-full group/edit">
+                                    <summary className="cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open/edit:bg-red-600 group-open/edit:text-white group-open/edit:hover:text-white transition-all">
+                                        <span>Edit Event</span>
+                                        <span className="group-open/edit:rotate-180 transition-transform text-lg">▾</span>
+                                    </summary>
+                                    <div className="px-2 py-6 sm:p-6 bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <EventForm event={e} />
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                    ))}
+
+                    <div className="bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 px-2 py-8 sm:p-8 flex flex-col justify-center items-center text-center min-h-[300px]">
+                        <details className="group we-full w-full">
+                            <summary className="cursor-pointer list-none flex flex-col items-center gap-4 group-open:hidden">
+                                <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-3xl text-zinc-400 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                    +
+                                </div>
+                                <span className="font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">Add New Event</span>
+                            </summary>
+                            <div className="text-left w-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                <h3 className="font-black text-xl uppercase italic font-heading tracking-tighter mb-4 text-center">New Event</h3>
+                                <EventForm />
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
 
             {/* Blog Posts */}
             <section>

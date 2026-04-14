@@ -69,6 +69,19 @@ export interface BlogPost {
     updated_at: string;
 }
 
+export interface Event {
+    id: string;
+    title: string;
+    description: string | null;
+    venue: string;
+    city: string | null;
+    date: string; // YYYY-MM-DD
+    time: string; // HH:mm
+    link: string | null;
+    image: string | null;
+    created_at: string;
+}
+
 export type RequestType = "ROLE_CHANGE" | "USER_EDIT" | "ARTIST_EDIT" | "ARTIST_ADD" | "BOOKING_INQUIRY" | "BOOKING_EDIT";
 
 export interface UnifiedRequest {

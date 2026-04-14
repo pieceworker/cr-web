@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { BookingDate } from "@/lib/db";
+import { BookingDate, Event } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -8,36 +8,7 @@ export default async function EventsPage() {
   const { env } = await getCloudflareContext();
   const db = env.DB;
 
-  // Static events data
-  const staticEvents = [
-    {
-      date: "Jan 27",
-      time: "7:00 PM",
-      venue: "Napoleon Street Gallery",
-      city: "San Francisco",
-      program: "Mozart Birthday House Concert",
-      link: "https://www.eventbrite.com/e/1979273892493",
-      isoData: "2026-01-27"
-    },
-    {
-      date: "Feb 3",
-      time: "7:00 PM",
-      venue: "Napoleon Street Gallery",
-      city: "San Francisco",
-      program: "Mendelssohn Birthday House Concert",
-      link: "https://www.eventbrite.com/e/1981908731367",
-      isoData: "2026-02-03"
-    },
-    {
-      date: "Feb 14",
-      time: "7:00 PM",
-      venue: "Red Poppy Art House",
-      city: "San Francisco",
-      program: "The Musical Art Quintet",
-      link: "https://www.eventbrite.com/e/1980912022183",
-      isoData: "2026-02-14"
-    },
-  ];
+
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr + "T00:00:00");
@@ -52,13 +23,17 @@ export default async function EventsPage() {
     return `${displayH}:${minutes} ${ampm}`;
   }
 
-  // Fetch public booking dates from D1
+  // Fetch dynamic booking dates from D1
   const bookingsRes = await db.prepare(`
     SELECT bd.*, b.name as program
     FROM booking_dates bd
     JOIN bookings b ON bd.booking_id = b.id
     WHERE b.status = 'APPROVED' AND bd.is_public = 1
   `).all();
+
+  // Fetch admin-created events from D1
+  const eventsRes = await db.prepare("SELECT * FROM events").all();
+  const dbEvents = eventsRes.results as unknown as Event[] || [];
 
   const dynamicEvents = (bookingsRes.results as unknown as BookingDate[] || []).map((bd) => ({
     date: formatDate(bd.date),
@@ -70,8 +45,18 @@ export default async function EventsPage() {
     dateObj: new Date(bd.date + "T00:00:00")
   }));
 
+  const adminEvents = dbEvents.map(e => ({
+    date: formatDate(e.date),
+    time: formatTime(e.time),
+    venue: e.venue,
+    city: e.city || "",
+    program: e.title,
+    link: e.link || "#",
+    dateObj: new Date(e.date + "T00:00:00")
+  }));
+
   const allEvents = [
-    ...staticEvents.map(e => ({ ...e, dateObj: new Date(e.isoData + "T00:00:00") })),
+    ...adminEvents,
     ...dynamicEvents
   ];
 
