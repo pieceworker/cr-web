@@ -1009,3 +1009,40 @@ export async function deleteEvent(id: string) {
     revalidatePath("/admin");
 }
 
+// Media CRUD
+export async function createMediaItem(formData: FormData) {
+    const session = await auth();
+    if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
+
+    const type = formData.get("type") as 'image' | 'video' | 'youtube';
+    const url = formData.get("url") as string;
+    const title = formData.get("title") as string;
+
+    const db = await getDB();
+    await db.prepare(
+        "INSERT INTO media_items (id, type, url, title) VALUES (?, ?, ?, ?)"
+    ).bind(crypto.randomUUID(), type, url, title || null).run();
+
+    revalidatePath("/media");
+    revalidatePath("/admin");
+}
+
+export async function deleteMediaItem(id: string) {
+    const session = await auth();
+    if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
+
+    const db = await getDB();
+    const item = await db.prepare("SELECT type, url FROM media_items WHERE id = ?").bind(id).first() as { type: string; url: string } | null;
+
+    if (!item) throw new Error("Item not found");
+
+    await db.prepare("DELETE FROM media_items WHERE id = ?").bind(id).run();
+
+    if (item.type === 'image' || item.type === 'video') {
+        await deleteR2Image(item.url);
+    }
+
+    revalidatePath("/media");
+    revalidatePath("/admin");
+}
+

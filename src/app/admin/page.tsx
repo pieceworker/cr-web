@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import Link from "next/link";
-import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest, BlogPost, Event } from "@/lib/db";
+import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest, BlogPost, Event, MediaItem } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { deleteBlogPost } from "@/lib/actions";
@@ -12,6 +12,8 @@ import NewChapterForm from "@/components/NewChapterForm";
 import EventForm from "@/components/EventForm";
 import ChapterCard from "@/components/ChapterCard";
 import EventCard from "@/components/EventCard";
+import MediaCard from "@/components/MediaCard";
+import MediaForm from "@/components/MediaForm";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +58,9 @@ async function getAdminData() {
     const eventsRes = await db.prepare("SELECT * FROM events ORDER BY date ASC").all();
     const events = eventsRes.results as unknown as Event[];
 
+    const mediaRes = await db.prepare("SELECT * FROM media_items ORDER BY created_at DESC").all();
+    const mediaItems = mediaRes.results as unknown as MediaItem[];
+
     // Fetch all artists, bookings, and chapters to match R2 images against
     const allArtists = artists.results as unknown as Artist[];
     const allBookings = bookingsRes.results as unknown as Booking[];
@@ -89,7 +94,8 @@ async function getAdminData() {
         blogPosts,
         events,
         users,
-        uploadedImages
+        uploadedImages,
+        mediaItems
     };
 }
 
@@ -100,10 +106,9 @@ const BUTTON_DANGER = "text-red-600 font-bold hover:underline text-xs uppercase 
 
 
 export default async function AdminPage() {
+    const { requests, chapters, artists, bookings, users, blogPosts, events, uploadedImages, mediaItems } = await getAdminData();
     const session = await auth();
     if (!isAdmin(session?.user?.email)) redirect("/");
-
-    const { requests, chapters, artists, bookings, users, blogPosts, events, uploadedImages } = await getAdminData();
 
     return (
         <div className="max-w-6xl mx-auto py-12 px-2 sm:px-6 space-y-24">
@@ -206,6 +211,29 @@ export default async function AdminPage() {
                             <div className="text-left w-full animate-in fade-in slide-in-from-bottom-4 duration-300 px-2 py-8 sm:p-8">
                                 <h3 className="font-black text-xl uppercase italic font-heading tracking-tighter mb-4 text-center">New Event</h3>
                                 <EventForm />
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            {/* Media */}
+            <section>
+                <h2 className={`${SECTION_HEADER} mb-8`}>Media ({mediaItems.length})</h2>
+                <div className="grid gap-4 mt-6">
+                    {mediaItems.map(item => <MediaCard key={item.id} item={item} />)}
+
+                    <div className="bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 flex flex-col justify-center items-center text-center">
+                        <details className="group w-full">
+                            <summary className="cursor-pointer list-none flex flex-col items-center gap-4 group-open:hidden py-12">
+                                <div className="w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-3xl text-zinc-400 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                    +
+                                </div>
+                                <span className="font-bold uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 transition-colors">Add New Media Item</span>
+                            </summary>
+                            <div className="text-left w-full animate-in fade-in slide-in-from-bottom-4 duration-300 px-2 py-8 sm:p-8">
+                                <h3 className="font-black text-xl uppercase italic font-heading tracking-tighter mb-4 text-center">New Media</h3>
+                                <MediaForm />
                             </div>
                         </details>
                     </div>

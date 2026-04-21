@@ -82,6 +82,14 @@ export interface Event {
     created_at: string;
 }
 
+export interface MediaItem {
+    id: string;
+    type: 'image' | 'video' | 'youtube';
+    url: string;
+    title: string | null;
+    created_at: string;
+}
+
 export type RequestType = "ROLE_CHANGE" | "USER_EDIT" | "ARTIST_EDIT" | "ARTIST_ADD" | "BOOKING_INQUIRY" | "BOOKING_EDIT";
 
 export interface UnifiedRequest {
