@@ -221,8 +221,6 @@ export default async function AdminPage() {
             <section>
                 <h2 className={`${SECTION_HEADER} mb-8`}>Media ({mediaItems.length})</h2>
                 <div className="grid gap-4 mt-6">
-                    {mediaItems.map(item => <MediaCard key={item.id} item={item} />)}
-
                     <div className="bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 flex flex-col justify-center items-center text-center">
                         <details className="group w-full">
                             <summary className="cursor-pointer list-none flex flex-col items-center gap-4 group-open:hidden py-12">
@@ -237,6 +235,8 @@ export default async function AdminPage() {
                             </div>
                         </details>
                     </div>
+
+                    {mediaItems.map(item => <MediaCard key={item.id} item={item} />)}
                 </div>
             </section>
 
