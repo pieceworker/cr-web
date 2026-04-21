@@ -99,7 +99,7 @@ export default function MediaForm() {
                     <select
                         value={type}
                         onChange={(e) => {
-                            setType(e.target.value as any);
+                            setType(e.target.value as 'image' | 'video' | 'youtube');
                             setPreviewUrl(null);
                             setFile(null);
                             setUrl("");
