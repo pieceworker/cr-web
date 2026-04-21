@@ -68,21 +68,27 @@ async function getAdminData() {
 
     // Use R2 binding as source of truth for images
     const r2List = await env.R2.list();
-    const uploadedImages = r2List.objects.map(obj => {
+    const uploadedMedia = r2List.objects.map(obj => {
         const url = `/api/image/${obj.key}`;
 
-        // Find matching artist, booking, or chapter
+        // Find matching artist, booking, chapter, blog post, event, or media item
         const artist = allArtists.find(a => a.image === url);
         const booking = allBookings.find(b => b.image === url);
         const chapter = allChapters.find(c => c.image === url);
         const blogPost = blogPosts.find(p => p.image === url);
         const event = events.find(e => e.image === url);
+        const mediaItem = mediaItems.find(m => m.url === url);
+
+        const id = artist?.id || booking?.id || chapter?.id || blogPost?.id || event?.id || mediaItem?.id || obj.key;
+        const name = artist?.name || booking?.name || chapter?.location || blogPost?.title || event?.title || mediaItem?.title || obj.key;
+        const type = artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : (event ? 'event' : (mediaItem ? 'media' : 'unlinked')))));
 
         return {
-            id: artist?.id || booking?.id || chapter?.id || blogPost?.id || event?.id || obj.key,
-            name: artist?.name || booking?.name || chapter?.location || blogPost?.title || event?.title || obj.key,
-            image: url,
-            type: artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : (event ? 'event' : 'unlinked'))))
+            id,
+            name,
+            url,
+            type,
+            contentType: obj.httpMetadata?.contentType || 'application/octet-stream'
         };
     });
 
@@ -94,7 +100,7 @@ async function getAdminData() {
         blogPosts,
         events,
         users,
-        uploadedImages,
+        uploadedMedia,
         mediaItems
     };
 }
@@ -106,7 +112,7 @@ const BUTTON_DANGER = "text-red-600 font-bold hover:underline text-xs uppercase 
 
 
 export default async function AdminPage() {
-    const { requests, chapters, artists, bookings, users, blogPosts, events, uploadedImages, mediaItems } = await getAdminData();
+    const { requests, chapters, artists, bookings, users, blogPosts, events, uploadedMedia, mediaItems } = await getAdminData();
     const session = await auth();
     if (!isAdmin(session?.user?.email)) redirect("/");
 
@@ -279,34 +285,43 @@ export default async function AdminPage() {
                 </div>
             </section>
 
-            {/* Uploaded Images */}
+            {/* Uploaded Media */}
             <section>
-                <h2 className={SECTION_HEADER}>Uploaded Images ({uploadedImages.length})</h2>
+                <h2 className={SECTION_HEADER}>Uploaded Media ({uploadedMedia.length})</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 mt-6">
-                    {uploadedImages.map((img) => (
+                    {uploadedMedia.map((file) => (
                         <div
-                            key={img.image}
+                            key={file.url}
                             className="group block bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-2 hover:border-red-600 transition-all shadow-sm"
                         >
                             <Link
-                                href={img.type === 'unlinked' ? img.image : (img.type === 'artist' ? `/artists/${img.id}` : (img.type === 'chapter' ? `/chapters/${img.id}` : (img.type === 'blog_post' ? `/blog/${img.id}` : `/bookings/${img.id}`)))}
-                                target={img.type === 'unlinked' ? "_blank" : undefined}
+                                href={file.type === 'unlinked' ? file.url : (file.type === 'artist' ? `/artists/${file.id}` : (file.type === 'chapter' ? `/chapters/${file.id}` : (file.type === 'blog_post' ? `/blog/${file.id}` : (file.type === 'media' ? '/media' : `/bookings/${file.id}`))))}
+                                target={file.type === 'unlinked' ? "_blank" : undefined}
                             >
-                                <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden">
-                                    <Image src={img.image} alt={img.name} fill className="object-cover" unoptimized />
+                                <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden bg-zinc-100 dark:bg-zinc-900">
+                                    {file.contentType.startsWith('video/') ? (
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-zinc-400 group-hover:text-red-600 transition-colors">
+                                            <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center">
+                                                <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-current border-b-[6px] border-b-transparent ml-1" />
+                                            </div>
+                                            <span className="text-[8px] font-bold uppercase mt-2">Video</span>
+                                        </div>
+                                    ) : (
+                                        <Image src={file.url} alt={file.name} fill className="object-cover" unoptimized />
+                                    )}
                                 </div>
                                 <div className="mt-2 text-[8px] font-black uppercase tracking-tighter truncate text-zinc-500 group-hover:text-red-600">
-                                    {img.type === 'unlinked' ? 'Unlinked File' : img.name}
+                                    {file.type === 'unlinked' ? 'Unlinked File' : file.name}
                                 </div>
                                 <div className="text-[6px] font-bold text-zinc-400 truncate uppercase tracking-tighter">
-                                    {img.type === 'unlinked' ? img.id : `${img.type}: ${img.id}`}
+                                    {file.type === 'unlinked' ? file.id : `${file.type}: ${file.id}`}
                                 </div>
                             </Link>
                         </div>
                     ))}
-                    {uploadedImages.length === 0 && (
+                    {uploadedMedia.length === 0 && (
                         <div className="col-span-full py-12 text-center border-2 border-dashed border-zinc-200 dark:border-zinc-800">
-                            <p className="text-zinc-500 italic uppercase tracking-widest text-sm">No R2-stored images found.</p>
+                            <p className="text-zinc-500 italic uppercase tracking-widest text-sm">No R2-stored media files found.</p>
                         </div>
                     )}
                 </div>
