@@ -1,5 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { Event } from "@/lib/db";
+import { Event, BookingDate } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,7 +28,11 @@ export default async function EventDetailPage({ params }: { params: { id: string
             notFound();
         }
 
-        const bd = bookingDateRes as unknown as any;
+        const bd = bookingDateRes as unknown as (BookingDate & { 
+            program: string; 
+            booking_image: string | null; 
+            booking_description: string | null; 
+        });
         eventData = {
             id: bd.id,
             title: bd.event_type || 'Event',
