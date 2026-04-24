@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { BookingDate, Event } from "@/lib/db";
 
@@ -25,7 +26,7 @@ export default async function EventsPage() {
 
   // Fetch dynamic booking dates from D1
   const bookingsRes = await db.prepare(`
-    SELECT bd.*, b.name as program
+    SELECT bd.*, b.name as program, b.image as booking_image
     FROM booking_dates bd
     JOIN bookings b ON bd.booking_id = b.id
     WHERE b.status = 'APPROVED' AND bd.is_public = 1
@@ -35,24 +36,30 @@ export default async function EventsPage() {
   const eventsRes = await db.prepare("SELECT * FROM events").all();
   const dbEvents = eventsRes.results as unknown as Event[] || [];
 
-  const dynamicEvents = (bookingsRes.results as unknown as BookingDate[] || []).map((bd) => ({
+  const dynamicEvents = (bookingsRes.results as unknown as (BookingDate & { booking_image: string })[] || []).map((bd) => ({
+    id: bd.id,
     date: formatDate(bd.date),
     time: formatTime(bd.time),
     venue: bd.location,
     city: "",
     program: bd.event_type || 'Event',
     link: "#",
-    dateObj: new Date(bd.date + "T00:00:00")
+    image: bd.booking_image || null,
+    dateObj: new Date(bd.date + "T00:00:00"),
+    type: 'dynamic' as const
   }));
 
   const adminEvents = dbEvents.map(e => ({
+    id: e.id,
     date: formatDate(e.date),
     time: formatTime(e.time),
     venue: e.venue,
     city: e.city || "",
     program: e.title,
     link: e.link || "#",
-    dateObj: new Date(e.date + "T00:00:00")
+    image: e.image || null,
+    dateObj: new Date(e.date + "T00:00:00"),
+    type: 'admin' as const
   }));
 
   const allEvents = [
@@ -84,31 +91,59 @@ export default async function EventsPage() {
           filteredEvents.map((event, i) => (
             <div
               key={i}
-              className="group border border-zinc-200 dark:border-zinc-800 px-2 py-6 sm:p-6 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+              className="group border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 relative overflow-hidden"
             >
-              <div className="flex-1">
-                <div>
-                  <div className="text-red-600 font-bold tracking-widest uppercase text-sm mb-1">
+              {/* Main Card Link */}
+              <Link 
+                href={`/events/${event.id}`} 
+                className="absolute inset-0 z-0"
+                aria-label={`View details for ${event.program}`}
+              />
+
+              <div className="flex-1 flex flex-col md:flex-row items-start md:items-center gap-4 p-4 sm:p-6 relative z-10 pointer-events-none">
+                {/* Thumbnail */}
+                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-zinc-100 dark:bg-zinc-800 border-2 border-red-600/10 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500 shadow-sm">
+                  {event.image ? (
+                    <Image
+                      src={event.image}
+                      alt={event.program}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-300 dark:text-zinc-700">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                <div className="min-w-0">
+                  <div className="text-red-600 font-bold tracking-widest uppercase text-xs mb-1">
                     {event.date} • {event.time}
                   </div>
-                  <h2 className="text-2xl font-bold text-zinc-900 dark:text-white group-hover:text-red-600 transition-colors leading-tight">
+                  <h2 className="text-2xl font-black uppercase italic font-heading tracking-tighter text-zinc-900 dark:text-white group-hover:text-red-600 transition-colors leading-tight">
                     {event.program}
                   </h2>
-                  <p className="text-zinc-600 dark:text-zinc-500 font-medium">
+                  <p className="text-zinc-600 dark:text-zinc-500 font-medium italic">
                     {event.venue}{event.city ? `, ${event.city}` : ""}
                   </p>
                 </div>
               </div>
 
               {event.link !== "#" && (
-                <Link
-                  href={event.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full md:w-auto text-center border border-zinc-900 dark:border-white px-2 sm:px-8 py-3 font-bold uppercase text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all"
-                >
-                  Get Tickets
-                </Link>
+                <div className="relative z-20 px-4 pb-4 md:p-6 md:pl-0">
+                  <Link
+                    href={event.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full md:w-auto text-center border border-zinc-900 dark:border-white px-8 py-3 font-bold uppercase text-xs tracking-widest text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all whitespace-nowrap"
+                  >
+                    Get Tickets
+                  </Link>
+                </div>
               )}
             </div>
           ))
