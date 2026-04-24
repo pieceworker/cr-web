@@ -6,10 +6,10 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function EventDetailPage({ params }: { params: { id: string } }) {
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { env } = await getCloudflareContext();
     const db = env.DB;
-    const { id } = params;
+    const { id } = await params;
 
     // Try fetching from events table first
     const eventRes = await db.prepare("SELECT * FROM events WHERE id = ?").bind(id).first();
