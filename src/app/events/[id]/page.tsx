@@ -88,12 +88,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                     </header>
 
                     {eventData.image && (
-                        <div className="aspect-[16/9] relative border-4 border-zinc-900 dark:border-white shadow-[20px_20px_0_0_rgba(220,38,38,0.1)] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                        <div className="border-4 border-zinc-900 dark:border-white shadow-[20px_20px_0_0_rgba(220,38,38,0.1)] bg-zinc-100 dark:bg-zinc-800 inline-block overflow-hidden">
                             <Image 
                                 src={eventData.image} 
                                 alt={eventData.title} 
-                                fill 
-                                className="object-cover" 
+                                width={1200}
+                                height={800}
+                                className="w-full h-auto block" 
                                 priority
                                 unoptimized
                             />
