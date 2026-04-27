@@ -99,7 +99,7 @@ export default async function BookingsPage() {
                         <h1 className="text-5xl md:text-7xl font-black uppercase italic text-zinc-900 dark:text-white font-heading leading-none tracking-tighter">
                             Bookings<br /><span className="text-red-600">Inquiry</span>
                         </h1>
-                        <p className="text-zinc-500 font-medium italic">From backyard gatherings to elegant weddings and private events, tell us what you&apos;re planning and we&apos;ll bring the music.</p>
+                        <p className="text-zinc-500 font-medium italic">Got a private event? Need musicians for your wedding? Let us know and we&apos;ll get back to you as soon as possible.</p>
                     </div>
                     <BookingForm
                         disabled={!isAuthenticated}
