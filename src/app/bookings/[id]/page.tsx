@@ -29,14 +29,14 @@ export default async function BookingProfilePage({ params }: { params: Promise<{
     if (!data) notFound();
     const { booking, creator, dates } = data;
 
-    const displayImage = booking.image_preference === 'google' ? creator?.image : booking.image;
+    const displayImage = creator?.image;
 
     return (
         <div className="max-w-6xl mx-auto py-20 px-2 sm:px-6 space-y-12">
             <div className="flex flex-col md:flex-row gap-12 items-center md:items-start text-center md:text-left">
-                {/* Booking Image */}
+                {/* Booking Creator Image */}
                 <div className="relative group">
-                    <div className="w-64 h-64 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden shrink-0 relative shadow-2xl">
+                    <div className="w-64 h-64 bg-zinc-100 dark:bg-zinc-900 border-2 border-red-600 overflow-hidden shrink-0 relative shadow-2xl rounded-full">
                         {displayImage ? (
                             <Image src={displayImage} alt={booking.name} fill className="object-cover transition-all duration-500" unoptimized />
                         ) : (
@@ -45,13 +45,6 @@ export default async function BookingProfilePage({ params }: { params: Promise<{
                             </div>
                         )}
                     </div>
-                    {creator && (
-                        <div className="absolute -bottom-6 -right-6 flex">
-                            <div className="w-16 h-16 rounded-full border-4 border-white dark:border-zinc-950 overflow-hidden bg-zinc-200 dark:bg-zinc-800 shadow-xl relative ring-1 ring-zinc-200 dark:ring-zinc-800">
-                                {creator.image && <Image src={creator.image} alt={creator.name || 'Creator'} fill className="object-cover" unoptimized />}
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <div className="space-y-8 flex-1 pt-8 md:pt-0">

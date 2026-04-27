@@ -19,8 +19,8 @@
 		"next": "15.5.9",
 		"next-auth": "^5.0.0-beta.30",
 		"playwright": "^1.59.1",
-		"react": "19.1.4",
-		"react-dom": "19.1.4",
+		"react": "^19.2.5",
+		"react-dom": "^19.2.5",
 		"react-markdown": "^10.1.0"
 	},
 	"devDependencies": {
@@ -29,6 +29,7 @@
 		"@types/node": "^20.19.27",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"esbuild": "^0.28.0",
 		"eslint": "^9",
 		"eslint-config-next": "15.4.6",
 		"tailwindcss": "^4",

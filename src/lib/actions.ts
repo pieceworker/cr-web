@@ -183,12 +183,8 @@ export async function approveUnifiedRequest(requestId: string) {
     } else if (request.type === 'ARTIST_ADD') {
         statements.push(db.prepare("UPDATE artists SET status = 'APPROVED' WHERE id = ?").bind(request.target_id));
     } else if (request.type === 'BOOKING_EDIT') {
-        const booking = await db.prepare("SELECT image FROM bookings WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
-        if (booking?.image && booking.image !== data.image) {
-            await deleteR2Image(booking.image);
-        }
-        statements.push(db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ?, image = ? WHERE id = ?").bind(
-            data.name, data.email, data.phone, data.questions, data.image_preference || 'custom', data.image || null, request.target_id
+        statements.push(db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED' WHERE id = ?").bind(
+            data.name, data.email, data.phone, data.questions, request.target_id
         ));
         statements.push(db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(request.target_id));
 
@@ -203,8 +199,8 @@ export async function approveUnifiedRequest(requestId: string) {
         for (let i = 0; i < dates.length; i++) {
             statements.push(
                 db.prepare(`
-                    INSERT INTO booking_dates (id, booking_id, date, time, duration, event_type, location, description, budget, is_public)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                    INSERT INTO booking_dates (id, booking_id, date, time, duration, event_type, location, description, budget)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `).bind(
                     crypto.randomUUID(),
                     request.target_id,
@@ -244,15 +240,10 @@ export async function rejectUnifiedRequest(requestId: string) {
     const proposedImage = data.image;
 
     if (proposedImage) {
-        if (request.type === 'ARTIST_ADD' || request.type === 'BOOKING_INQUIRY') {
+        if (request.type === 'ARTIST_ADD') {
             await deleteR2Image(proposedImage);
         } else if (request.type === 'ARTIST_EDIT') {
             const current = await db.prepare("SELECT image FROM artists WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
-            if (current?.image !== proposedImage) {
-                await deleteR2Image(proposedImage);
-            }
-        } else if (request.type === 'BOOKING_EDIT') {
-            const current = await db.prepare("SELECT image FROM bookings WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
             if (current?.image !== proposedImage) {
                 await deleteR2Image(proposedImage);
             }
@@ -490,8 +481,6 @@ export async function createBooking(formData: FormData) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
     const questions = formData.get("questions") as string;
-    const image = formData.get("image") as string;
-    const imagePreference = formData.get("image_preference") as string || 'custom';
 
     // Dates data is sent as arrays from the dynamic form
     const dates = formData.getAll("dates[]") as string[];
@@ -507,16 +496,16 @@ export async function createBooking(formData: FormData) {
 
     const statements = [
         db.prepare(`
-            INSERT INTO bookings (id, name, email, phone, questions, created_by, status, image, image_preference) 
-            VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
-        `).bind(bookingId, name, email, phone, questions, session.user.id, image || null, imagePreference)
+            INSERT INTO bookings (id, name, email, phone, questions, created_by, status) 
+            VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
+        `).bind(bookingId, name, email, phone, questions, session.user.id)
     ];
 
     for (let i = 0; i < dates.length; i++) {
         statements.push(
             db.prepare(`
-                INSERT INTO booking_dates (id, booking_id, date, time, duration, event_type, location, description, budget, is_public)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                INSERT INTO booking_dates (id, booking_id, date, time, duration, event_type, location, description, budget)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `).bind(
                 crypto.randomUUID(),
                 bookingId,
@@ -534,9 +523,7 @@ export async function createBooking(formData: FormData) {
     await db.batch(statements);
 
     await createUnifiedRequest("BOOKING_INQUIRY", bookingId, {
-        name, email, phone,
-        image: image || null,
-        image_preference: imagePreference
+        name, email, phone
     });
 
     revalidatePath("/bookings");
@@ -552,19 +539,6 @@ export async function approveBooking(bookingId: string) {
 
     revalidatePath("/admin");
     revalidatePath("/bookings");
-}
-
-export async function toggleBookingDatePublic(dateId: string, isPublic: boolean) {
-    const session = await auth();
-    if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
-
-    const db = await getDB();
-    await db.prepare("UPDATE booking_dates SET is_public = ? WHERE id = ?")
-        .bind(isPublic ? 1 : 0, dateId)
-        .run();
-
-    revalidatePath("/admin");
-    revalidatePath("/events");
 }
 
 export async function deleteBooking(bookingId: string) {
@@ -583,10 +557,6 @@ export async function deleteBooking(bookingId: string) {
         db.prepare("DELETE FROM bookings WHERE id = ?").bind(bookingId),
         db.prepare("DELETE FROM requests WHERE target_id = ?").bind(bookingId)
     ]);
-
-    if (booking.image) {
-        await deleteR2Image(booking.image);
-    }
 
     revalidatePath("/admin");
     revalidatePath("/bookings");
@@ -677,12 +647,10 @@ export async function deleteUser(userId: string) {
     const user = await db.prepare("SELECT name FROM users WHERE id = ?").bind(userId).first() as { name: string } | null;
     if (!user) throw new Error("User not found");
 
-    // 2. Fetch all artists and bookings to identify images for cleanup
+    // 2. Fetch all artists to identify images for cleanup
     const artistsToDelete = await db.prepare("SELECT id, image FROM artists WHERE owner_id = ?").bind(userId).all();
-    const bookingsToDelete = await db.prepare("SELECT id, image FROM bookings WHERE created_by = ?").bind(userId).all();
-
     const artistImages = (artistsToDelete.results as { image: string | null }[]).map(a => a.image).filter(Boolean);
-    const bookingImages = (bookingsToDelete.results as { image: string | null }[]).map(b => b.image).filter(Boolean);
+    const bookingImages: (string | null)[] = [];
 
     // 3. Fetch all artists to determine deletions vs updates
     const allArtistsResult = await db.prepare("SELECT id, owner_id, members FROM artists").all();
@@ -796,8 +764,6 @@ export async function updateBooking(formData: FormData) {
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
     const questions = formData.get("questions") as string;
-    const image = formData.get("image") as string;
-    const imagePreference = formData.get("image_preference") as string || 'custom';
     const isAdminAction = formData.get("isAdminAction") === "true";
 
     const dates = formData.getAll("dates[]") as string[];
@@ -811,19 +777,17 @@ export async function updateBooking(formData: FormData) {
     const db = await getDB();
 
     // Check ownership or admin
-    const existingResult = await db.prepare("SELECT created_by, image FROM bookings WHERE id = ?").bind(id).first();
-    const existing = existingResult as { created_by: string; image: string | null } | null;
+    const existingResult = await db.prepare("SELECT created_by FROM bookings WHERE id = ?").bind(id).first();
+    const existing = existingResult as { created_by: string } | null;
     if (!existing) throw new Error("Booking not found");
     if (!isAdmin(session?.user?.email) && existing.created_by !== session.user.id) throw new Error("Unauthorized");
 
     if (isAdmin(session?.user?.email) && isAdminAction) {
-        if (existing.image && existing.image !== image) {
-            await deleteR2Image(existing.image);
-        }
+
         const reviewRequestId = formData.get("reviewRequestId") as string | null;
         const statements = [
-            db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED', image_preference = ?, image = ? WHERE id = ?").bind(
-                name, email, phone, questions, imagePreference, image, id
+            db.prepare("UPDATE bookings SET name = ?, email = ?, phone = ?, questions = ?, status = 'APPROVED' WHERE id = ?").bind(
+                name, email, phone, questions, id
             ),
             db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(id)
         ];
@@ -831,8 +795,8 @@ export async function updateBooking(formData: FormData) {
         for (let i = 0; i < dates.length; i++) {
             statements.push(
                 db.prepare(`
-                    INSERT INTO booking_dates (id, booking_id, date, time, duration, event_type, location, description, budget, is_public)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                    INSERT INTO booking_dates (id, booking_id, date, time, duration, event_type, location, description, budget)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 `).bind(
                     crypto.randomUUID(),
                     id,
@@ -854,7 +818,7 @@ export async function updateBooking(formData: FormData) {
         await db.batch(statements);
     } else {
         await createUnifiedRequest("BOOKING_EDIT", id, {
-            name, email, phone, questions, image, image_preference: imagePreference,
+            name, email, phone, questions,
             dates, times, durations, eventTypes, locations, descriptions, budgets
         });
     }

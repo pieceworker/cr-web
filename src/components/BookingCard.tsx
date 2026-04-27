@@ -3,14 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Booking, BookingDate, UnifiedRequest } from "@/lib/db";
-import { deleteBooking, toggleBookingDatePublic } from "@/lib/actions";
+import { deleteBooking } from "@/lib/actions";
 import BookingForm from "@/components/BookingForm";
 import DiffViewer from "./DiffViewer";
 
 const BUTTON_SECONDARY = "bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-2 px-2 sm:px-6 hover:bg-zinc-700 dark:hover:bg-zinc-200 transition-all text-xs tracking-widest active:scale-[0.98]";
 
 interface BookingCardProps {
-    b: Booking & { user_name: string; user_image?: string, image?: string | null, dates: BookingDate[] };
+    b: Booking & { user_name: string; user_image?: string, dates: BookingDate[] };
     requests: UnifiedRequest[];
     isAdmin?: boolean;
 }
@@ -28,15 +28,17 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
                 {/* Inquiry Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-6">
                     <div className="flex gap-6 items-start">
-                        <div className="w-16 h-16 rounded-full border-2 border-red-600 overflow-hidden relative grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500 shrink-0">
-                            {(b.image_preference === 'google' ? b.user_image : (b.image || b.user_image)) && (
+                        <div className="w-16 h-16 rounded-full border-2 border-red-600 overflow-hidden relative grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500 shrink-0 bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
+                            {b.user_image ? (
                                 <Image
-                                    src={b.image_preference === 'google' ? b.user_image! : (b.image || b.user_image!)}
+                                    src={b.user_image}
                                     alt={b.user_name || 'User'}
                                     fill
                                     className="object-cover"
                                     unoptimized
                                 />
+                            ) : (
+                                <span className="text-xl font-black text-zinc-400">?</span>
                             )}
                         </div>
                         <div className="space-y-1 min-w-0">
@@ -71,20 +73,6 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
                                 <div className="space-y-1">
                                     <p className="font-black text-lg uppercase italic text-red-600">{date.date}</p>
                                     <p className="text-xs font-bold uppercase tracking-widest">{date.time} ({date.duration || 'N/A'})</p>
-                                </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <span className={`text-[10px] font-black uppercase px-2 py-0.5 tracking-widest border ${date.is_public ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-transparent text-zinc-400 border-zinc-200'}`}>
-                                        {date.is_public ? 'Public on Events' : 'Private'}
-                                    </span>
-                                    {isAdmin && (
-                                        <form action={async () => {
-                                            await toggleBookingDatePublic(date.id, !date.is_public);
-                                        }}>
-                                            <button className="text-[10px] font-bold uppercase text-red-600 hover:underline">
-                                                {date.is_public ? 'Make Private' : 'Make Public'}
-                                            </button>
-                                        </form>
-                                    )}
                                 </div>
                             </div>
                             <div className="space-y-2">

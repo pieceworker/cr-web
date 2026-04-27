@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { BookingDate, Event } from "@/lib/db";
+import { Event } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -24,32 +24,11 @@ export default async function EventsPage() {
     return `${displayH}:${minutes} ${ampm}`;
   }
 
-  // Fetch dynamic booking dates from D1
-  const bookingsRes = await db.prepare(`
-    SELECT bd.*, b.name as program, b.image as booking_image
-    FROM booking_dates bd
-    JOIN bookings b ON bd.booking_id = b.id
-    WHERE b.status = 'APPROVED' AND bd.is_public = 1
-  `).all();
-
   // Fetch admin-created events from D1
   const eventsRes = await db.prepare("SELECT * FROM events").all();
   const dbEvents = eventsRes.results as unknown as Event[] || [];
 
-  const dynamicEvents = (bookingsRes.results as unknown as (BookingDate & { booking_image: string })[] || []).map((bd) => ({
-    id: bd.id,
-    date: formatDate(bd.date),
-    time: formatTime(bd.time),
-    venue: bd.location,
-    city: "",
-    program: bd.event_type || 'Event',
-    link: "#",
-    image: bd.booking_image || null,
-    dateObj: new Date(bd.date + "T00:00:00"),
-    type: 'dynamic' as const
-  }));
-
-  const adminEvents = dbEvents.map(e => ({
+  const allEvents = dbEvents.map(e => ({
     id: e.id,
     date: formatDate(e.date),
     time: formatTime(e.time),
@@ -61,11 +40,6 @@ export default async function EventsPage() {
     dateObj: new Date(e.date + "T00:00:00"),
     type: 'admin' as const
   }));
-
-  const allEvents = [
-    ...adminEvents,
-    ...dynamicEvents
-  ];
 
   // Filter events: Keep only those where the event date is today or in the future
   const now = new Date();

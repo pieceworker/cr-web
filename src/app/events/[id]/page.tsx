@@ -1,5 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { Event, BookingDate } from "@/lib/db";
+import { Event } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -12,39 +12,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     const { id } = await params;
 
     // Try fetching from events table first
-    const eventRes = await db.prepare("SELECT * FROM events WHERE id = ?").bind(id).first();
-    let eventData = eventRes as unknown as Event;
+    const eventData = await db.prepare("SELECT * FROM events WHERE id = ?").bind(id).first() as unknown as Event;
 
     if (!eventData) {
-        // Try fetching from booking_dates table
-        const bookingDateRes = await db.prepare(`
-            SELECT bd.*, b.name as program, b.image as booking_image, b.description as booking_description
-            FROM booking_dates bd
-            JOIN bookings b ON bd.booking_id = b.id
-            WHERE bd.id = ? AND b.status = 'APPROVED' AND bd.is_public = 1
-        `).bind(id).first();
-
-        if (!bookingDateRes) {
-            notFound();
-        }
-
-        const bd = bookingDateRes as unknown as (BookingDate & { 
-            program: string; 
-            booking_image: string | null; 
-            booking_description: string | null; 
-        });
-        eventData = {
-            id: bd.id,
-            title: bd.event_type || 'Event',
-            description: bd.description || bd.booking_description || "",
-            venue: bd.location,
-            city: "",
-            date: bd.date,
-            time: bd.time,
-            link: null,
-            image: bd.booking_image,
-            created_at: ""
-        };
+        notFound();
     }
 
     // Format date and time (consistent with listing page but more detailed)

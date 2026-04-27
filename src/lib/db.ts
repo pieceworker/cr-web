@@ -40,10 +40,8 @@ export interface Booking {
     email: string;
     phone: string;
     questions: string | null;
-    image: string | null;
     created_by: string;
     status: "PENDING" | "APPROVED";
-    image_preference: 'custom' | 'google';
 }
 
 export interface BookingDate {
@@ -56,7 +54,6 @@ export interface BookingDate {
     location: string;
     description: string | null;
     budget: string | null;
-    is_public: boolean;
 }
 
 export interface BlogPost {

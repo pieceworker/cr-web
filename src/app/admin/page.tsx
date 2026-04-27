@@ -63,7 +63,6 @@ async function getAdminData() {
 
     // Fetch all artists, bookings, and chapters to match R2 images against
     const allArtists = artists.results as unknown as Artist[];
-    const allBookings = bookingsRes.results as unknown as Booking[];
     const allChapters = chapters.results as unknown as Chapter[];
 
     // Use R2 binding as source of truth for images
@@ -73,15 +72,14 @@ async function getAdminData() {
 
         // Find matching artist, booking, chapter, blog post, event, or media item
         const artist = allArtists.find(a => a.image === url);
-        const booking = allBookings.find(b => b.image === url);
         const chapter = allChapters.find(c => c.image === url);
         const blogPost = blogPosts.find(p => p.image === url);
         const event = events.find(e => e.image === url);
         const mediaItem = mediaItems.find(m => m.url === url);
 
-        const id = artist?.id || booking?.id || chapter?.id || blogPost?.id || event?.id || mediaItem?.id || obj.key;
-        const name = artist?.name || booking?.name || chapter?.location || blogPost?.title || event?.title || mediaItem?.title || obj.key;
-        const type = artist ? 'artist' : (booking ? 'booking' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : (event ? 'event' : (mediaItem ? 'media' : 'unlinked')))));
+        const id = artist?.id || chapter?.id || blogPost?.id || event?.id || mediaItem?.id || obj.key;
+        const name = artist?.name || chapter?.location || blogPost?.title || event?.title || mediaItem?.title || obj.key;
+        const type = artist ? 'artist' : (chapter ? 'chapter' : (blogPost ? 'blog_post' : (event ? 'event' : (mediaItem ? 'media' : 'unlinked'))));
 
         return {
             id,
@@ -295,7 +293,7 @@ export default async function AdminPage() {
                             className="group block bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-2 hover:border-red-600 transition-all shadow-sm"
                         >
                             <Link
-                                href={file.type === 'unlinked' ? file.url : (file.type === 'artist' ? `/artists/${file.id}` : (file.type === 'chapter' ? `/chapters/${file.id}` : (file.type === 'blog_post' ? `/blog/${file.id}` : (file.type === 'media' ? '/media' : `/bookings/${file.id}`))))}
+                                href={file.type === 'unlinked' ? file.url : (file.type === 'artist' ? `/artists/${file.id}` : (file.type === 'chapter' ? `/chapters/${file.id}` : (file.type === 'blog_post' ? `/blog/${file.id}` : (file.type === 'media' ? '/media' : file.url))))}
                                 target={file.type === 'unlinked' ? "_blank" : undefined}
                             >
                                 <div className="aspect-square relative grayscale-[0.5] group-hover:grayscale-0 transition-grayscale duration-500 overflow-hidden bg-zinc-100 dark:bg-zinc-900">
