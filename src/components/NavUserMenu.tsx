@@ -6,6 +6,7 @@ import Link from 'next/link';
 interface NavItem {
     name: string;
     path: string;
+    secondary?: { name: string; path: string };
 }
 
 interface NavUserMenuProps {
@@ -67,14 +68,27 @@ export default function NavUserMenu({ session, navItems, signOutAction, signInAc
                 <div className="absolute right-0 top-full mt-2 w-[280px] sm:w-[320px] max-h-[calc(100vh-5rem)] overflow-y-auto bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 shadow-2xl z-[60] py-4 animate-in fade-in slide-in-from-top-2 duration-200 scale-95 origin-top-right">
                     <div className="flex flex-col">
                         {navItems.map((item) => (
-                            <Link
-                                key={item.path}
-                                href={item.path}
-                                onClick={() => setIsOpen(false)}
-                                className="block px-4 sm:px-6 py-3 text-sm sm:text-base font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
-                            >
-                                {item.name}
-                            </Link>
+                            <div key={item.path} className="flex items-center px-4 sm:px-6 py-3 text-sm sm:text-base font-bold uppercase tracking-widest text-zinc-600 dark:text-zinc-400 group hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
+                                <Link
+                                    href={item.path}
+                                    onClick={() => setIsOpen(false)}
+                                    className="hover:text-red-600 transition-colors"
+                                >
+                                    {item.name}
+                                </Link>
+                                {item.secondary && (
+                                    <>
+                                        <span className="mx-2 text-zinc-300 dark:text-zinc-700 font-normal">/</span>
+                                        <Link
+                                            href={item.secondary.path}
+                                            onClick={() => setIsOpen(false)}
+                                            className="hover:text-red-600 transition-colors"
+                                        >
+                                            {item.secondary.name}
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
                         ))}
 
                         {session ? (

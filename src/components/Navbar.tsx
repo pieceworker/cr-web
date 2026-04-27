@@ -9,15 +9,12 @@ export default async function Navbar() {
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
-    { name: 'Events', path: '/events' },
-    { name: 'Bookings', path: '/bookings' },
-    { name: 'Blog', path: '/blog' },
+    { name: 'Events', path: '/events', secondary: { name: 'Bookings', path: '/bookings' } },
     { name: 'Chapters', path: '/chapters' },
-    { name: 'Artists', path: '/artists' },
-    { name: 'Musicians', path: '/musicians' },
-    { name: 'Donate', path: '/donate' },
-    { name: 'Be Involved', path: '/be-involved' },
+    { name: 'Artists', path: '/artists', secondary: { name: 'Musicians', path: '/musicians' } },
+    { name: 'Donate', path: '/donate', secondary: { name: 'Be Involved', path: '/be-involved' } },
     { name: 'Media', path: '/media' },
+    { name: 'Blog', path: '/blog' },
   ];
 
   if (session) {
