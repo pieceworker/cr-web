@@ -75,7 +75,7 @@ export default async function ProfilePage() {
                     <div className="px-2 py-8 sm:p-8 space-y-6">
                         <div className="flex items-center gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6 mb-6">
                             <div className="w-16 h-16 rounded-full border-2 border-red-600/20 overflow-hidden relative">
-                                {user?.image && <Image src={user.image} alt={user.name || "User"} fill className="object-cover" unoptimized />}
+                                {user?.image && <Image src={user.image} alt={user.name || "User"} fill className="w-full h-full object-cover" unoptimized />}
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold uppercase italic font-heading tracking-tighter">{user?.name}</h2>

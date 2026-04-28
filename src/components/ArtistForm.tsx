@@ -291,7 +291,7 @@ export default function ArtistForm({
                                         <div className="space-y-1">
                                             <p className={LABEL}>Current Custom Image</p>
                                             <div className="aspect-square w-32 relative border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 overflow-hidden grayscale-[0.5]">
-                                                <Image src={(pendingData?.image ?? artist?.image)!} alt="Current" fill className="object-cover" unoptimized />
+                                                <Image src={(pendingData?.image ?? artist?.image)!} alt="Current" fill className="w-full h-full object-cover" unoptimized />
                                             </div>
                                         </div>
                                     )}
@@ -299,7 +299,7 @@ export default function ArtistForm({
                                         <div className="space-y-1">
                                             <p className={`${LABEL} text-green-600`}>New Preview</p>
                                             <div className="aspect-square w-32 relative border-2 border-green-500 bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
-                                                <Image src={previewUrl} alt="Preview" fill className="object-cover" unoptimized />
+                                                <Image src={previewUrl} alt="Preview" fill className="w-full h-full object-cover" unoptimized />
                                             </div>
                                         </div>
                                     )}
@@ -328,7 +328,7 @@ export default function ArtistForm({
                                             src={availableMusicians.find(u => u.id === (artist?.owner_id || currentUserId))!.image!}
                                             alt="Google Photo"
                                             fill
-                                            className="object-cover"
+                                            className="w-full h-full object-cover"
                                             unoptimized
                                         />
                                     ) : (

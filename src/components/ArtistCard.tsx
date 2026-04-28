@@ -51,7 +51,7 @@ export default function ArtistCard({ a, requests, chapters, users, isAdmin = fal
         <div className={`bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col transition-all ${isPending && !isAdmin ? 'opacity-75 grayscale-[0.2]' : ''}`}>
             <div className="px-2 py-8 sm:p-8 flex flex-col md:flex-row gap-8 items-start">
                 <div className="w-32 h-32 bg-zinc-200 dark:bg-zinc-800 border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
-                    {displayImage && <Image src={displayImage} alt={displayArtist.name} fill className="object-cover" unoptimized />}
+                    {displayImage && <Image src={displayImage} alt={displayArtist.name} fill className="w-full h-full object-cover" unoptimized />}
                 </div>
                 <div className="flex-1 space-y-2 min-w-0 w-full">
                     <div className="flex justify-between items-start">

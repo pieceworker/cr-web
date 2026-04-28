@@ -43,7 +43,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
         <div className="max-w-6xl mx-auto py-20 px-2 sm:px-6">
             <div className="flex flex-col md:flex-row gap-12 items-center md:items-start text-center md:text-left">
                 <div className="w-48 h-48 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-900 border-4 border-red-600 shrink-0 relative">
-                    {user.image && <Image src={user.image} alt={user.name ?? "Member"} fill className="object-cover" unoptimized />}
+                    {user.image && <Image src={user.image} alt={user.name ?? "Member"} fill className="w-full h-full object-cover" unoptimized />}
                 </div>
 
                 <div className="space-y-6 flex-1">

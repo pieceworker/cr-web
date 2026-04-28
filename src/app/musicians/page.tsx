@@ -29,7 +29,7 @@ export default async function MusiciansPage() {
                     {musicians.length > 0 ? musicians.map((m) => (
                         <Link href={`/profile/${m.id}`} key={m.id} className="text-center group cursor-pointer block">
                             <div className="aspect-square rounded-full bg-zinc-100 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 mb-4 overflow-hidden relative mx-auto group-hover:border-red-600 transition-all duration-500">
-                                {m.image && <Image src={m.image} alt={m.name ?? "Member"} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
+                                {m.image && <Image src={m.image} alt={m.name ?? "Member"} fill className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
                             </div>
                             <h3 className="font-black text-sm uppercase tracking-tight leading-tight font-heading group-hover:text-red-600 transition-colors">{m.name}</h3>
                             {m.location && <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1 truncate">{m.location}</p>}

@@ -84,7 +84,7 @@ export default async function ChapterProfilePage({ params }: { params: Promise<{
                         {directors.map((d) => (
                             <Link href={`/profile/${d.id}`} key={d.id} className="text-center group cursor-pointer block">
                                 <div className="aspect-square rounded-full bg-zinc-800 border border-zinc-700 mb-3 overflow-hidden relative mx-auto max-w-[150px]">
-                                    {d.image && <Image src={d.image} alt={d.name ?? "Director"} fill className="object-cover grayscale group-hover:grayscale-0 transition-all duration-500" unoptimized />}
+                                    {d.image && <Image src={d.image} alt={d.name ?? "Director"} fill className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" unoptimized />}
                                 </div>
                                 <h3 className="font-bold text-sm uppercase tracking-tight leading-tight font-heading text-white">{d.name}</h3>
                                 {d.location && <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1 truncate">{d.location}</p>}
@@ -103,7 +103,7 @@ export default async function ChapterProfilePage({ params }: { params: Promise<{
                     {musicians.length > 0 ? musicians.map((m) => (
                         <Link href={`/profile/${m.id}`} key={m.id} className="text-center group cursor-pointer block">
                             <div className="aspect-square rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-3 overflow-hidden relative mx-auto max-w-[150px]">
-                                {m.image && <Image src={m.image} alt={m.name ?? "Member"} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
+                                {m.image && <Image src={m.image} alt={m.name ?? "Member"} fill className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
                             </div>
                             <h3 className="font-bold text-sm uppercase tracking-tight leading-tight font-heading">{m.name}</h3>
                             {m.location && <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1 truncate">{m.location}</p>}
@@ -121,7 +121,7 @@ export default async function ChapterProfilePage({ params }: { params: Promise<{
                     {audience.length > 0 ? audience.map((a) => (
                         <Link href={`/profile/${a.id}`} key={a.id} className="text-center group cursor-pointer block">
                             <div className="aspect-square rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 mb-3 overflow-hidden relative mx-auto max-w-[150px]">
-                                {a.image && <Image src={a.image} alt={a.name ?? "Member"} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
+                                {a.image && <Image src={a.image} alt={a.name ?? "Member"} fill className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized />}
                             </div>
                             <h3 className="font-bold text-sm uppercase tracking-tight leading-tight font-heading">{a.name}</h3>
                             {a.location && <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1 truncate">{a.location}</p>}

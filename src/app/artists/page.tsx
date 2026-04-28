@@ -75,7 +75,7 @@ export default async function ArtistsPage() {
                                 {(() => {
                                     const owner = availableMusicians.find(u => u.id === a.owner_id);
                                     const displayImage = a.image_preference === 'google' ? owner?.image : a.image;
-                                    return displayImage ? <Image src={displayImage} alt={a.name} fill className="object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized /> : null;
+                                    return displayImage ? <Image src={displayImage} alt={a.name} fill className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" unoptimized /> : null;
                                 })()}
                             </div>
                             <h3 className="font-black text-2xl uppercase tracking-tighter font-heading mb-1">{a.name}</h3>

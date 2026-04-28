@@ -34,7 +34,7 @@ export default function BookingCard({ b, requests, isAdmin = false }: BookingCar
                                     src={b.user_image}
                                     alt={b.user_name || 'User'}
                                     fill
-                                    className="object-cover"
+                                    className="w-full h-full object-cover"
                                     unoptimized
                                 />
                             ) : (

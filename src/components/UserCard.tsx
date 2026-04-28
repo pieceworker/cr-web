@@ -44,7 +44,7 @@ export default function UserCard({ u, requests, chapters, isAdmin = false }: Use
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-full border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
-                            {u.image && <Image src={u.image} alt={u.name || 'User'} fill className="object-cover" unoptimized />}
+                            {u.image && <Image src={u.image} alt={u.name || 'User'} fill className="w-full h-full object-cover" unoptimized />}
                         </div>
                         <div className="min-w-0">
                             <div className="flex items-center gap-2">
