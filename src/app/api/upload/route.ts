@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        const { env } = await getCloudflareContext();
+        
 
         // Use a clean UUID
         const id = crypto.randomUUID();

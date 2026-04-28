@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { BlogPost, User, isAdmin } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -10,7 +10,7 @@ import BlogForm from "@/components/BlogForm";
 export const dynamic = "force-dynamic";
 
 async function getPostData(id: string) {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     
     const postRes = await db.prepare("SELECT * FROM blog_posts WHERE id = ?").bind(id).first();

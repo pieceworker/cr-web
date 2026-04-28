@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request, { params }: { params: Promise<{ key: string }> }) {
@@ -8,7 +8,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ key: str
             return new NextResponse("Not Found", { status: 404 });
         }
 
-        const { env } = await getCloudflareContext();
+        
 
         const object = await env.R2.get(key);
         if (!object) {

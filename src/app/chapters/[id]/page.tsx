@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Chapter, User } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 async function getData(id: string) {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     const chapter = await db.prepare("SELECT * FROM chapters WHERE id = ?").bind(id).first() as Chapter | null;
 

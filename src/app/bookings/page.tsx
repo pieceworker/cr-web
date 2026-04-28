@@ -1,5 +1,5 @@
 import { auth, signIn } from "@/auth";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Booking, BookingDate, UnifiedRequest } from "@/lib/db";
 import BookingForm from "@/components/BookingForm";
 import BookingCard from "@/components/BookingCard";
@@ -7,7 +7,7 @@ import BookingCard from "@/components/BookingCard";
 export const dynamic = "force-dynamic";
 
 async function getBookingsData(userId: string) {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
 
     // Get bookings with their dates and user info

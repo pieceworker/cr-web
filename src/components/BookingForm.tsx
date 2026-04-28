@@ -287,7 +287,7 @@ export default function BookingForm({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    import("@/lib/actions").then(m => m.rejectUnifiedRequest(reviewRequestId));
+                                    import("../lib/actions").then(m => m.rejectUnifiedRequest(reviewRequestId));
                                 }}
                                 className="bg-zinc-900 text-white dark:bg-white dark:text-black font-bold uppercase py-4 px-2 sm:px-8 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-all text-sm tracking-widest active:scale-[0.98] shadow-lg"
                             >

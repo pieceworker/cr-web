@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import Link from "next/link";
 import { isAdmin, Chapter, Artist, Booking, User, BookingDate, UnifiedRequest, BlogPost, Event, MediaItem } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { deleteBlogPost } from "@/lib/actions";
 import Image from "next/image";
 import UserCard from "@/components/UserCard";
@@ -18,7 +18,7 @@ import MediaForm from "@/components/MediaForm";
 export const dynamic = "force-dynamic";
 
 async function getAdminData() {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
 
     const requestsRes = await db.prepare(`

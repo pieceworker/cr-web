@@ -2,11 +2,11 @@
 
 import { auth } from "@/auth";
 import { isAdmin, User, Artist, RequestType, UnifiedRequest, Role } from "./db";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { revalidatePath } from "next/cache";
 
 async function getDB() {
-    const { env } = await getCloudflareContext();
+    
     return env.DB;
 }
 
@@ -17,7 +17,7 @@ async function deleteR2Image(imagePath: string | null) {
     if (!imagePath || !imagePath.startsWith("/api/image/")) return;
 
     const key = imagePath.replace("/api/image/", "");
-    const { env } = await getCloudflareContext();
+    
     try {
         await env.R2.delete(key);
     } catch (e) {

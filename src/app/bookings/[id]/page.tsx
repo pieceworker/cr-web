@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Booking, BookingDate, User } from "@/lib/db";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 async function getBookingData(id: string) {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
 
     // For public profile, we only show APPROVED bookings

@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Chapter } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,7 +6,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 async function getChapters() {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     const chapters = await db.prepare("SELECT * FROM chapters").all();
     return (chapters.results as unknown as Chapter[] || []);

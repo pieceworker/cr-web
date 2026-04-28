@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Artist, User } from "@/lib/db";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 async function getArtistData(id: string) {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     const artist = await db.prepare("SELECT * FROM artists WHERE id = ? AND status = 'APPROVED'").bind(id).first() as Artist | null;
 

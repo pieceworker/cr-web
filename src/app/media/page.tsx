@@ -1,11 +1,11 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { MediaItem } from "@/lib/db";
 import MediaGallery from "@/components/MediaGallery";
 
 export const dynamic = "force-dynamic";
 
 async function getMediaItems() {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     const res = await db.prepare("SELECT * FROM media_items ORDER BY created_at DESC").all();
     return res.results as unknown as MediaItem[];

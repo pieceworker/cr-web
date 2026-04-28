@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Event } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export default async function EventsPage() {
-  const { env } = await getCloudflareContext();
+  
   const db = env.DB;
 
 

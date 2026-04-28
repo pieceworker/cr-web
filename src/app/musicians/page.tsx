@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { User } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,7 +6,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 async function getMusicians() {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     const musicians = await db.prepare("SELECT * FROM users WHERE role = 'Musician' ORDER BY name ASC").all();
     return (musicians.results as unknown as User[] || []);

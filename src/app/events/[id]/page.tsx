@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { Event } from "@/lib/db";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     const { id } = await params;
 

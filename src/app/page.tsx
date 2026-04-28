@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { BlogPost } from "@/lib/db";
 import ReactMarkdown from 'react-markdown';
 
@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const { env } = await getCloudflareContext();
+  
   const db = env.DB;
   
   const latestPostRes = await db.prepare("SELECT * FROM blog_posts ORDER BY created_at DESC LIMIT 1").first();

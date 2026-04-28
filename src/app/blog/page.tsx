@@ -1,4 +1,4 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { BlogPost, User, isAdmin } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 export const dynamic = "force-dynamic";
 
 async function getBlogData() {
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
     
     // Fetch posts and authors

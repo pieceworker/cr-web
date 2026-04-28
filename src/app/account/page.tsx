@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { User, Chapter, Artist, UnifiedRequest } from "@/lib/db";
 import Image from "next/image";
 import MyArtists from "@/components/MyArtists";
@@ -14,7 +14,7 @@ export default async function ProfilePage() {
     const session = await auth();
     if (!session || !session.user?.id) redirect("/");
 
-    const { env } = await getCloudflareContext();
+    
     const db = env.DB;
 
     const user = await db.prepare("SELECT * FROM users WHERE id = ?").bind(session.user.id).first() as User | null;

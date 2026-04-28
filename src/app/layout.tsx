@@ -21,7 +21,7 @@ export const metadata = {
 };
 
 import { auth } from "@/auth";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { User, Chapter } from "@/lib/db";
 import UserSetup from '@/components/UserSetup';
 
@@ -35,7 +35,7 @@ export default async function RootLayout({
 	let chapters: Chapter[] = [];
 
 	if (session?.user?.email) {
-		const { env } = await getCloudflareContext();
+		
 		const db = env.DB;
 		user = await db.prepare("SELECT * FROM users WHERE id = ?").bind(session.user.id).first() as User | null;
 		const chaptersResult = await db.prepare("SELECT * FROM chapters").all();
