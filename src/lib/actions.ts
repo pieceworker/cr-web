@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { isAdmin, User, Artist, RequestType, UnifiedRequest, Role } from "./db";
 import { env } from "cloudflare:workers";
 import { revalidatePath } from "next/cache";
+import { sendAdminNotificationEmail } from "./email";
 
 async function getDB() {
     
@@ -85,6 +86,14 @@ export async function createUnifiedRequest(type: RequestType, targetId: string |
         targetId,
         JSON.stringify(data)
     ).run();
+
+    // Trigger email notification to admins via Resend
+    await sendAdminNotificationEmail(
+        type,
+        session.user.name || session.user.email || "Unknown User",
+        session.user.email || "No email",
+        data
+    );
 
     revalidatePath("/admin");
     revalidatePath("/account");
