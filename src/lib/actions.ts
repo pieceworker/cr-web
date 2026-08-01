@@ -60,8 +60,10 @@ async function getPendingArtistRequestCleanupStatements(db: any, userId: string)
             const data = JSON.parse(req.data || "{}");
             const members = data.members as string[] | undefined;
             if (Array.isArray(members) && members.includes(userId)) {
-                // This request includes the user being removed/demoted. Reject it.
-                cleanupStatements.push(db.prepare("UPDATE requests SET status = 'REJECTED' WHERE id = ?").bind(req.id));
+                // This request includes the user being removed/demoted. Delete it.
+                // REJECTED requests are orphaned data that isn't shown anywhere,
+                // so we delete them to prevent memory leaks.
+                cleanupStatements.push(db.prepare("DELETE FROM requests WHERE id = ?").bind(req.id));
             }
         } catch {
             // If skip malformed data
@@ -248,7 +250,7 @@ export async function rejectUnifiedRequest(requestId: string) {
     const data = request.data ? JSON.parse(request.data) : {};
     const proposedImage = data.image;
 
-    const statements = [];
+    const statements: any[] = [];
 
     // For booking-related requests, delete the booking and its dates
     if (request.type === 'BOOKING_INQUIRY' || request.type === 'BOOKING_EDIT') {
@@ -271,14 +273,12 @@ export async function rejectUnifiedRequest(requestId: string) {
         }
     }
 
-    // Mark request as rejected
-    statements.push(db.prepare("UPDATE requests SET status = 'REJECTED' WHERE id = ?").bind(requestId));
+    // Delete the request entirely instead of marking as REJECTED
+    // REJECTED requests are orphaned data that isn't shown anywhere
+    // and the user can always create a new request if needed
+    statements.push(db.prepare("DELETE FROM requests WHERE id = ?").bind(requestId));
 
-    if (statements.length > 1) {
-        await db.batch(statements);
-    } else {
-        await statements[0].run();
-    }
+    await db.batch(statements);
 
     revalidatePath("/admin");
     revalidatePath("/bookings");
