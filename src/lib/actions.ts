@@ -477,6 +477,21 @@ export async function createBooking(formData: FormData) {
     const session = await auth();
     if (!session?.user?.id) throw new Error("Unauthorized");
 
+    const db = await getDB();
+
+    // Prevent user from creating another booking inquiry if they already have a pending booking or request
+    const pendingReq = await db.prepare(
+        "SELECT id FROM requests WHERE user_id = ? AND status = 'PENDING' AND (type = 'BOOKING_INQUIRY' OR type = 'BOOKING_EDIT')"
+    ).bind(session.user.id).first();
+
+    const pendingBooking = await db.prepare(
+        "SELECT id FROM bookings WHERE created_by = ? AND status = 'PENDING'"
+    ).bind(session.user.id).first();
+
+    if (pendingReq || pendingBooking) {
+        throw new Error("You already have a pending booking request. Please wait for it to be processed before submitting another.");
+    }
+
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const phone = formData.get("phone") as string;
@@ -491,7 +506,6 @@ export async function createBooking(formData: FormData) {
     const descriptions = formData.getAll("descriptions[]") as string[];
     const budgets = formData.getAll("budgets[]") as string[];
 
-    const db = await getDB();
     const bookingId = crypto.randomUUID();
 
     const statements = [
@@ -817,6 +831,14 @@ export async function updateBooking(formData: FormData) {
 
         await db.batch(statements);
     } else {
+        const pendingReq = await db.prepare(
+            "SELECT id FROM requests WHERE target_id = ? AND status = 'PENDING' AND (type = 'BOOKING_INQUIRY' OR type = 'BOOKING_EDIT')"
+        ).bind(id).first();
+
+        if (pendingReq) {
+            throw new Error("An edit for this booking is already pending approval.");
+        }
+
         await createUnifiedRequest("BOOKING_EDIT", id, {
             name, email, phone, questions,
             dates, times, durations, eventTypes, locations, descriptions, budgets

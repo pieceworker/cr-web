@@ -50,6 +50,8 @@ export default async function BookingsPage() {
         ? await getBookingsData(userId)
         : { bookings: [], requests: [] };
 
+    const hasPendingRequest = requests.some(r => r.status === 'PENDING') || bookings.some(b => b.status === 'PENDING');
+
     return (
         <div className="max-w-6xl mx-auto w-full grid grid-cols-1 grid-rows-1 min-h-[calc(100vh-200px)]">
             {/* Unauthenticated Overlay */}
@@ -103,6 +105,7 @@ export default async function BookingsPage() {
                     </div>
                     <BookingForm
                         disabled={!isAuthenticated}
+                        hasPendingRequest={hasPendingRequest}
                         initialUserData={session?.user}
                     />
                 </section>

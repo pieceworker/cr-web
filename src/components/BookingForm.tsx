@@ -6,12 +6,13 @@ import { Booking, BookingDate, UnifiedRequest } from "@/lib/db";
 
 interface BookingFormProps {
     disabled?: boolean;
+    hasPendingRequest?: boolean;
     booking?: Booking & { dates: BookingDate[] };
     pendingEdit?: UnifiedRequest;
     isAdmin?: boolean;
     onClose?: () => void;
     initialUserData?: { name?: string | null; email?: string | null; image?: string | null };
-    reviewRequestId?: string; // Add this
+    reviewRequestId?: string;
 }
 
 interface BookingDateItem {
@@ -27,16 +28,20 @@ interface BookingDateItem {
 
 export default function BookingForm({
     disabled = false,
+    hasPendingRequest = false,
     booking,
     pendingEdit,
     isAdmin = false,
     onClose,
     initialUserData,
-    reviewRequestId // Add this
+    reviewRequestId
 }: BookingFormProps) {
     const isEdit = !!booking;
     const isPending = !!pendingEdit;
     const pendingData = pendingEdit?.data ? JSON.parse(pendingEdit.data) : null;
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Initialize dates from pending data, existing booking, or default
     const [dates, setDates] = useState<BookingDateItem[]>(() => {
@@ -110,14 +115,16 @@ export default function BookingForm({
             datesChanged;
     }, [name, email, phone, questions, dates, initialDates, pendingData, booking, initialUserData]);
 
+    const isFormDisabled = (disabled || (hasPendingRequest && !isEdit) || (isPending && !isAdmin)) && !reviewRequestId && !isAdmin;
+
     const addDate = () => {
-        if (dates.length < 100 && !disabled) {
+        if (dates.length < 100 && !isFormDisabled) {
             setDates([...dates, { id: Date.now(), date: '', time: '', duration: '', eventType: '', location: '', description: '', budget: '' }]);
         }
     };
 
     const removeDate = (id: number) => {
-        if (dates.length > 1 && !disabled) {
+        if (dates.length > 1 && !isFormDisabled) {
             setDates(dates.filter((d: BookingDateItem) => d.id !== id));
         }
     };
@@ -129,13 +136,22 @@ export default function BookingForm({
     return (
         <form
             action={async (formData) => {
+                if (isSubmitting) return;
+                setIsSubmitting(true);
+                setErrorMsg(null);
 
-                if (isEdit) {
-                    await updateBooking(formData);
-                } else {
-                    await createBooking(formData);
+                try {
+                    if (isEdit) {
+                        await updateBooking(formData);
+                    } else {
+                        await createBooking(formData);
+                    }
+                    if (onClose) onClose();
+                } catch (err: unknown) {
+                    const msg = err instanceof Error ? err.message : "An error occurred while submitting your request.";
+                    setErrorMsg(msg);
+                    setIsSubmitting(false);
                 }
-                if (onClose) onClose();
             }}
             className="space-y-8"
         >
@@ -143,13 +159,27 @@ export default function BookingForm({
             {reviewRequestId && <input type="hidden" name="reviewRequestId" value={reviewRequestId} />}
             {isAdmin && <input type="hidden" name="isAdminAction" value="true" />}
 
-            <fieldset disabled={(disabled || (isPending && !isAdmin)) && !reviewRequestId} className="space-y-8">
+            <fieldset disabled={isFormDisabled || isSubmitting} className="space-y-8">
+                {hasPendingRequest && !isEdit && !isAdmin && (
+                    <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 px-4 py-4 mb-6">
+                        <p className="text-sm font-medium italic text-zinc-800 dark:text-zinc-200">
+                            You currently have a booking request pending approval. You must wait until your active request is processed before submitting another.
+                        </p>
+                    </div>
+                )}
+
                 {isPending && !isAdmin && !reviewRequestId && (
                     <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 px-2 py-4 sm:p-4 mb-6">
                         <p className="text-sm font-medium italic text-zinc-800 dark:text-zinc-200">
                             An edit for this booking is currently pending approval.
                             The form shows the proposed changes.
                         </p>
+                    </div>
+                )}
+
+                {errorMsg && (
+                    <div className="bg-red-100 dark:bg-red-900/30 border border-red-600 text-red-700 dark:text-red-300 p-4 font-bold text-sm">
+                        {errorMsg}
                     </div>
                 )}
 
@@ -197,7 +227,7 @@ export default function BookingForm({
                         <button
                             type="button"
                             onClick={addDate}
-                            className={`text-xs font-bold uppercase tracking-widest py-2 px-2 sm:px-4 transition-colors ${disabled || (isPending && !isAdmin)
+                            className={`text-xs font-bold uppercase tracking-widest py-2 px-2 sm:px-4 transition-colors ${isFormDisabled || isSubmitting
                                 ? "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
                                 : "bg-zinc-900 text-white dark:bg-white dark:text-black hover:bg-red-600 dark:hover:bg-red-600 dark:hover:text-white"
                                 }`}
@@ -273,15 +303,23 @@ export default function BookingForm({
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button
                             type="submit"
-                            className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest shadow-lg ${(disabled || (isPending && !isAdmin)) && !reviewRequestId
+                            className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest shadow-lg ${isFormDisabled || isSubmitting
                                 ? "bg-zinc-200 text-zinc-400 cursor-not-allowed shadow-none"
                                 : (!isDirty && !reviewRequestId)
                                     ? "bg-zinc-200 text-zinc-400 cursor-not-allowed shadow-none"
                                     : "bg-red-600 text-white hover:bg-red-700 shadow-red-600/20 active:scale-[0.99]"
                                 }`}
-                            disabled={(!isDirty && !reviewRequestId) || ((disabled || (isPending && !isAdmin)) && !reviewRequestId)}
+                            disabled={isFormDisabled || isSubmitting || (!isDirty && !reviewRequestId)}
                         >
-                            {reviewRequestId && isAdmin ? "Approve & Save Changes" : (isAdmin ? "Save Booking" : (isPending ? "Request Pending" : (isEdit ? "Request Booking Update" : "Submit Booking Inquiry")))}
+                            {isSubmitting
+                                ? "Submitting..."
+                                : (reviewRequestId && isAdmin
+                                    ? "Approve & Save Changes"
+                                    : (isAdmin
+                                        ? "Save Booking"
+                                        : (isPending || (hasPendingRequest && !isEdit)
+                                            ? "Request Pending"
+                                            : (isEdit ? "Request Booking Update" : "Submit Booking Inquiry"))))}
                         </button>
                         {reviewRequestId && isAdmin && (
                             <button
