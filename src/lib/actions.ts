@@ -248,6 +248,18 @@ export async function rejectUnifiedRequest(requestId: string) {
     const data = request.data ? JSON.parse(request.data) : {};
     const proposedImage = data.image;
 
+    const statements = [];
+
+    // For booking-related requests, delete the booking and its dates
+    if (request.type === 'BOOKING_INQUIRY' || request.type === 'BOOKING_EDIT') {
+        if (request.target_id) {
+            // Delete associated booking dates first
+            statements.push(db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(request.target_id));
+            // Delete the booking itself
+            statements.push(db.prepare("DELETE FROM bookings WHERE id = ?").bind(request.target_id));
+        }
+    }
+
     if (proposedImage) {
         if (request.type === 'ARTIST_ADD') {
             await deleteR2Image(proposedImage);
@@ -259,9 +271,18 @@ export async function rejectUnifiedRequest(requestId: string) {
         }
     }
 
-    await db.prepare("UPDATE requests SET status = 'REJECTED' WHERE id = ?").bind(requestId).run();
+    // Mark request as rejected
+    statements.push(db.prepare("UPDATE requests SET status = 'REJECTED' WHERE id = ?").bind(requestId));
+
+    if (statements.length > 1) {
+        await db.batch(statements);
+    } else {
+        await statements[0].run();
+    }
 
     revalidatePath("/admin");
+    revalidatePath("/bookings");
+    revalidatePath("/account");
 }
 
 export async function approveRequest(requestId: string) {
@@ -562,6 +583,7 @@ export async function approveBooking(bookingId: string) {
 
     revalidatePath("/admin");
     revalidatePath("/bookings");
+    revalidatePath("/account");
 }
 
 export async function deleteBooking(bookingId: string) {
@@ -577,12 +599,14 @@ export async function deleteBooking(bookingId: string) {
     }
 
     await db.batch([
+        db.prepare("DELETE FROM booking_dates WHERE booking_id = ?").bind(bookingId),
         db.prepare("DELETE FROM bookings WHERE id = ?").bind(bookingId),
         db.prepare("DELETE FROM requests WHERE target_id = ?").bind(bookingId)
     ]);
 
     revalidatePath("/admin");
     revalidatePath("/bookings");
+    revalidatePath("/account");
 }
 
 
