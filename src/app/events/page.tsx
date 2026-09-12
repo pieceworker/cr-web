@@ -85,9 +85,12 @@ function EventCardItem({ event, isPast }: { event: EventItem; isPast: boolean })
         </div>
       ) : isPast ? (
         <div className="relative z-20 px-4 pb-4 md:p-6 md:pl-0 self-end md:self-center">
-          <span className="inline-block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 group-hover:text-red-600 transition-colors">
+          <Link
+            href={`/events/${event.id}`}
+            className="inline-block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-red-600 group-hover:text-red-600 transition-colors cursor-pointer"
+          >
             View Details ↗
-          </span>
+          </Link>
         </div>
       ) : null}
     </div>
