@@ -20,6 +20,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         notFound();
     }
 
+    // Check if event has passed
+    const eventDate = new Date(eventData.date + "T00:00:00");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isPast = eventDate < today;
+
     // Format date and time (consistent with listing page but more detailed)
     function formatDate(dateStr: string) {
         const date = new Date(dateStr + "T00:00:00");
@@ -47,8 +53,15 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
                 <div className="space-y-12">
                     <header className="space-y-6">
                         <div className="space-y-2">
-                            <div className="text-red-600 font-black uppercase text-sm tracking-[0.3em]">
-                                {formatDate(eventData.date)} • {formatTime(eventData.time)}
+                            <div className="flex items-center gap-3">
+                                {isPast && (
+                                    <span className="bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 text-[10px] px-2.5 py-1 tracking-widest font-black uppercase">
+                                        PAST EVENT
+                                    </span>
+                                )}
+                                <div className={`${isPast ? "text-zinc-500" : "text-red-600"} font-black uppercase text-sm tracking-[0.3em]`}>
+                                    {formatDate(eventData.date)} • {formatTime(eventData.time)}
+                                </div>
                             </div>
                             <h1 className="text-5xl md:text-7xl lg:text-8xl font-black uppercase italic font-heading tracking-tighter text-zinc-900 dark:text-white leading-[0.85]">
                                 {eventData.title}
@@ -83,9 +96,17 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
                 <aside className="lg:sticky lg:top-8 space-y-8">
                     <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm">
-                        <h3 className="font-black uppercase italic tracking-tighter text-2xl mb-6 border-b-4 border-red-600 pb-2 inline-block">Tickets & Info</h3>
+                        <h3 className="font-black uppercase italic tracking-tighter text-2xl mb-6 border-b-4 border-red-600 pb-2 inline-block">
+                            {isPast ? "Event Info" : "Tickets & Info"}
+                        </h3>
                         <div className="space-y-8">
-                            {eventData.link ? (
+                            {isPast ? (
+                                <div className="p-4 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-center">
+                                    <p className="text-xs font-black text-zinc-500 dark:text-zinc-400 uppercase tracking-widest">
+                                        This event has passed
+                                    </p>
+                                </div>
+                            ) : eventData.link ? (
                                 <Link 
                                     href={eventData.link}
                                     target="_blank"
@@ -135,7 +156,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
                             <div className="pt-8 border-t border-zinc-200 dark:border-zinc-800">
                                 <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em] leading-relaxed">
-                                    All events are subject to change. Please check back for updates or contact us with any questions.
+                                    {isPast
+                                        ? "This event has completed. Check our events page for upcoming concerts."
+                                        : "All events are subject to change. Please check back for updates or contact us with any questions."}
                                 </p>
                             </div>
                         </div>
