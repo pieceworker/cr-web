@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
+import { convertNakedUrlsToMarkdown } from "@/lib/markdown";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +76,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
 
                     {eventData.description && (
                         <div className="prose prose-zinc dark:prose-invert prose-lg max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-headings:italic prose-headings:font-heading prose-a:text-red-600 hover:prose-a:text-black dark:hover:prose-a:text-white prose-a:transition-colors prose-img:border prose-img:border-zinc-200 dark:prose-img:border-zinc-800 prose-img:grayscale-[0.2] hover:prose-img:grayscale-0 prose-img:transition-all prose-img:duration-700">
-                            <ReactMarkdown>{eventData.description}</ReactMarkdown>
+                            <ReactMarkdown>{convertNakedUrlsToMarkdown(eventData.description)}</ReactMarkdown>
                         </div>
                     )}
                 </div>

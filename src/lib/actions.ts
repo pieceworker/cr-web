@@ -5,6 +5,7 @@ import { isAdmin, User, Artist, RequestType, UnifiedRequest, Role } from "./db";
 import { env } from "cloudflare:workers";
 import { revalidatePath } from "next/cache";
 import { sendAdminNotificationEmail } from "./email";
+import { convertNakedUrlsToMarkdown } from "./markdown";
 
 async function getDB() {
     
@@ -965,7 +966,8 @@ export async function createEvent(formData: FormData) {
     if (!isAdmin(session?.user?.email)) throw new Error("Admin only");
 
     const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    const rawDescription = formData.get("description") as string;
+    const description = rawDescription ? convertNakedUrlsToMarkdown(rawDescription) : "";
     const venue = formData.get("venue") as string;
     const city = formData.get("city") as string;
     const date = formData.get("date") as string;
@@ -988,7 +990,8 @@ export async function updateEvent(formData: FormData) {
 
     const id = formData.get("id") as string;
     const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
+    const rawDescription = formData.get("description") as string;
+    const description = rawDescription ? convertNakedUrlsToMarkdown(rawDescription) : "";
     const venue = formData.get("venue") as string;
     const city = formData.get("city") as string;
     const date = formData.get("date") as string;
