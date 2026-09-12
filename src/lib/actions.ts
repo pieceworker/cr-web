@@ -1008,6 +1008,7 @@ export async function updateEvent(formData: FormData) {
     ).bind(title, description || null, venue, city || null, date, time, link || null, image || null, id).run();
 
     revalidatePath("/events");
+    revalidatePath(`/events/${id}`);
     revalidatePath("/admin");
 }
 

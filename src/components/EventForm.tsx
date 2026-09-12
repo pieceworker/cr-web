@@ -77,7 +77,18 @@ export default function EventForm({ event, onSuccess }: EventFormProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
                     <input name="title" required placeholder="Event Title" defaultValue={event?.title} className={INPUT} />
-                    <textarea name="description" placeholder="Description..." defaultValue={event?.description || ""} className={`${INPUT} h-24`} />
+                    <div className="space-y-1">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                            <span>Description (Markdown)</span>
+                            <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank" rel="noreferrer" className="text-red-600 hover:underline">Guide ↗</a>
+                        </div>
+                        <textarea 
+                            name="description" 
+                            placeholder="Write event description using markdown..." 
+                            defaultValue={event?.description || ""} 
+                            className={`${INPUT} h-28 font-mono text-xs resize-y`} 
+                        />
+                    </div>
                     <input name="venue" required placeholder="Venue" defaultValue={event?.venue} className={INPUT} />
                     <input name="city" placeholder="City" defaultValue={event?.city || ""} className={INPUT} />
                 </div>
