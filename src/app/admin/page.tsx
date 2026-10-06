@@ -55,7 +55,7 @@ async function getAdminData() {
     const blogPostsRes = await db.prepare("SELECT * FROM blog_posts ORDER BY created_at DESC").all();
     const blogPosts = blogPostsRes.results as unknown as BlogPost[];
 
-    const eventsRes = await db.prepare("SELECT * FROM events ORDER BY date ASC").all();
+    const eventsRes = await db.prepare("SELECT * FROM events ORDER BY date DESC").all();
     const events = eventsRes.results as unknown as Event[];
 
     const mediaRes = await db.prepare("SELECT * FROM media_items ORDER BY created_at DESC").all();
@@ -202,8 +202,6 @@ export default async function AdminPage() {
             <section>
                 <h2 className={`${SECTION_HEADER} mb-8`}>Events ({events.length})</h2>
                 <div className="grid gap-4 mt-6">
-                    {events.map(e => <EventCard key={e.id} event={e} />)}
-
                     <div className="bg-zinc-50 dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 flex flex-col justify-center items-center text-center">
                         <details className="group w-full">
                             <summary className="cursor-pointer list-none flex flex-col items-center gap-4 group-open:hidden py-12">
@@ -218,6 +216,8 @@ export default async function AdminPage() {
                             </div>
                         </details>
                     </div>
+
+                    {events.map(e => <EventCard key={e.id} event={e} />)}
                 </div>
             </section>
 
