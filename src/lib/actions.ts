@@ -122,26 +122,7 @@ export async function approveUnifiedRequest(requestId: string) {
             request.user_id
         ));
 
-        if (role === 'Musician' || role === 'Chapter Director') {
-            // Check if solo artist already exists
-            const existing = await db.prepare("SELECT id FROM artists WHERE owner_id = ?").bind(request.user_id).first();
-            if (!existing) {
-                const user = await db.prepare("SELECT name, image, chapters FROM users WHERE id = ?").bind(request.user_id).first() as User;
-                statements.push(db.prepare(
-                    "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)"
-                ).bind(
-                    crypto.randomUUID(),
-                    user.name || "New Artist",
-                    data.location || null,
-                    data.bio || null,
-                    user.image || null,
-                    request.user_id,
-                    JSON.stringify([request.user_id]),
-                    user.chapters || "[]",
-                    'google'
-                ));
-            }
-        } else if (role === 'Audience') {
+        if (role === 'Audience') {
             const { cleanupStatements: cleanup, imagesToDelete } = await getArtistCleanupStatements(db, request.user_id);
             statements.push(...cleanup);
             if (imagesToDelete.length > 0) {
