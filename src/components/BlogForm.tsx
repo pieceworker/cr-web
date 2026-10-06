@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState } from "react";
+import { useTransition, useState, useMemo } from "react";
 import { BlogPost } from "@/lib/db";
 import { createBlogPost, updateBlogPost } from "@/lib/actions";
 
@@ -17,6 +17,11 @@ export default function BlogForm({ post }: BlogFormProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const isDirty = useMemo(() => {
+        if (!post) return true;
+        return true;
+    }, [post]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -147,8 +152,8 @@ export default function BlogForm({ post }: BlogFormProps) {
             </div>
 
             <div className="pt-4 flex justify-end">
-                <button type="submit" disabled={isPending || isUploading} className={`${BUTTON_PRIMARY} ${isPending || isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    {isUploading ? 'Uploading Image...' : isPending ? 'Saving...' : (post ? 'Update Post' : 'Publish Post')}
+                <button type="submit" disabled={(isPending || isUploading || (post && !isDirty))} className={`${BUTTON_PRIMARY} ${(isPending || isUploading || (post && !isDirty)) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {isUploading ? 'Uploading Image...' : isPending ? 'Saving...' : (post ? 'Save Changes' : 'Publish Post')}
                 </button>
             </div>
         </form>

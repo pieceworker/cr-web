@@ -211,7 +211,7 @@ export default function ProfileForm({
                             }`}
                         disabled={(!isDirty && !reviewRequestId && !isModal) || (isPending && !reviewRequestId)}
                     >
-                        {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save User Changes" : (isPending ? "Request Pending" : (isModal ? "Complete Setup" : "Request Changes")))}
+                        {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save Changes" : (isPending ? "Request Pending" : (isModal ? "Complete Setup" : "Save Changes")))}
                     </button>
                     {isAdmin && reviewRequestId && (
                         <button

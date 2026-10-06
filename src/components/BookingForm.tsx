@@ -316,10 +316,10 @@ export default function BookingForm({
                                 : (reviewRequestId && isAdmin
                                     ? "Approve & Save Changes"
                                     : (isAdmin
-                                        ? "Save Booking"
+                                        ? "Save Changes"
                                         : (isPending || (hasPendingRequest && !isEdit)
                                             ? "Request Pending"
-                                            : (isEdit ? "Request Booking Update" : "Submit Booking Inquiry"))))}
+                                            : (isEdit ? "Save Changes" : "Submit Booking Inquiry"))))}
                         </button>
                         {reviewRequestId && isAdmin && (
                             <button

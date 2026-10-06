@@ -115,7 +115,7 @@ export default function ChapterEditForm({ chapter }: ChapterEditFormProps) {
                 className={`${BUTTON_PRIMARY} w-full`}
                 disabled={!isDirty || isUploading}
             >
-                {isUploading ? "Uploading..." : "Save"}
+                {isUploading ? "Uploading..." : "Save Changes"}
             </button>
         </form>
     );
