@@ -145,25 +145,7 @@ export async function approveUnifiedRequest(requestId: string) {
             request.target_id
         ));
 
-        // If role changed to Musician/Chapter Director via edit, handle solo artist
-        if (roleStr === 'Musician' || roleStr === 'Chapter Director') {
-            const existing = await db.prepare("SELECT id FROM artists WHERE owner_id = ?").bind(request.target_id).first();
-            if (!existing) {
-                statements.push(db.prepare(
-                    "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)"
-                ).bind(
-                    crypto.randomUUID(),
-                    data.name || "New Artist",
-                    data.location || null,
-                    data.bio || null,
-                    null, // we don't have user image here easily without another query, or it's unchanged
-                    request.target_id,
-                    JSON.stringify([request.target_id]),
-                    JSON.stringify(data.chapters || []),
-                    'google'
-                ));
-            }
-        }
+        // If role changed to Musician/Chapter Director via edit, do NOT auto-create artist
     }
     else if (request.type === 'ARTIST_EDIT') {
         const artist = await db.prepare("SELECT image FROM artists WHERE id = ?").bind(request.target_id).first() as { image: string | null } | null;
@@ -625,25 +607,7 @@ export async function updateUser(formData: FormData) {
         statements.push(db.prepare("UPDATE requests SET status = 'APPROVED' WHERE id = ?").bind(reviewRequestId));
     }
 
-    if (role === 'Musician' || role === 'Chapter Director') {
-        const existing = await db.prepare("SELECT id FROM artists WHERE owner_id = ?").bind(id).first();
-        if (!existing) {
-            const user = await db.prepare("SELECT image FROM users WHERE id = ?").bind(id).first() as { image: string | null };
-            statements.push(db.prepare(
-                "INSERT INTO artists (id, name, location, bio, image, owner_id, status, members, chapters, image_preference) VALUES (?, ?, ?, ?, ?, ?, 'APPROVED', ?, ?, ?)"
-            ).bind(
-                crypto.randomUUID(),
-                name,
-                location,
-                bio,
-                user?.image || null,
-                id,
-                JSON.stringify([id]),
-                JSON.stringify(chapters),
-                'google'
-            ));
-        }
-    } else if (role === 'Audience') {
+    if (role === 'Audience') {
         const { cleanupStatements: cleanup, imagesToDelete } = await getArtistCleanupStatements(db, id);
         statements.push(...cleanup);
 
