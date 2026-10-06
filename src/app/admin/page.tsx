@@ -14,6 +14,7 @@ import ChapterCard from "@/components/ChapterCard";
 import EventCard from "@/components/EventCard";
 import MediaCard from "@/components/MediaCard";
 import MediaForm from "@/components/MediaForm";
+import BlogForm from "@/components/BlogForm";
 
 export const dynamic = "force-dynamic";
 
@@ -256,26 +257,38 @@ export default async function AdminPage() {
                     {blogPosts.map(post => {
                         const author = users.find(u => u.id === post.author_id);
                         return (
-                            <div key={post.id} className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-4 flex justify-between items-center group hover:border-red-600 transition-colors">
-                                <div className="flex items-center gap-4">
-                                    {post.image && (
-                                        <div className="w-12 h-12 relative overflow-hidden bg-zinc-200 dark:bg-zinc-800">
-                                            <Image src={post.image} alt="Thumbnail" fill className="object-cover grayscale-[0.5] group-hover:grayscale-0" unoptimized />
+                            <div key={post.id} className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex flex-col hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-all group">
+                                <div className="px-2 py-6 sm:p-6 space-y-4">
+                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-16 h-16 bg-zinc-200 dark:bg-zinc-800 border-2 border-red-600/20 overflow-hidden relative shrink-0 grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500">
+                                                {post.image && (
+                                                    <Image src={post.image} alt={post.title} fill className="object-cover" unoptimized />
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <Link href={`/blog/${post.id}`} className="hover:underline hover:text-red-600">
+                                                    <h3 className="text-xl font-black uppercase italic font-heading tracking-tighter leading-tight break-words">{post.title}</h3>
+                                                </Link>
+                                                <p className="text-sm text-zinc-500 font-medium italic truncate">By {author?.name || 'Unknown'} • {new Date(post.created_at).toLocaleDateString()}</p>
+                                            </div>
                                         </div>
-                                    )}
-                                    <div>
-                                        <Link href={`/blog/${post.id}`} className="hover:underline hover:text-red-600">
-                                            <h3 className="font-bold text-lg leading-tight truncate max-w-[300px] sm:max-w-[500px]">{post.title}</h3>
-                                        </Link>
-                                        <p className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest">
-                                            By {author?.name || 'Unknown'} • {new Date(post.created_at).toLocaleDateString()}
-                                        </p>
+                                        <form action={deleteBlogPost.bind(null, post.id)} className="w-full sm:w-auto">
+                                            <button className={`${BUTTON_DANGER} w-full text-left sm:text-right`}>Delete</button>
+                                        </form>
                                     </div>
                                 </div>
-                                
-                                <form action={deleteBlogPost.bind(null, post.id)}>
-                                    <button className={BUTTON_DANGER}>Delete</button>
-                                </form>
+                                <div className="w-full">
+                                    <details className="w-full group/edit">
+                                        <summary className="cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open/edit:bg-red-600 group-open/edit:text-white group-open/edit:hover:text-white transition-all">
+                                            <span>Edit Post</span>
+                                            <span className="group-open/edit:rotate-180 transition-transform text-lg">▾</span>
+                                        </summary>
+                                        <div className="px-2 py-8 sm:p-8 bg-white dark:bg-black border-t border-zinc-200 dark:border-zinc-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                                            <BlogForm post={post} />
+                                        </div>
+                                    </details>
+                                </div>
                             </div>
                         );
                     })}
