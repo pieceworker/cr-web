@@ -9,7 +9,7 @@ interface BlogFormProps {
 }
 
 const INPUT_STYLE = "w-full bg-zinc-100 dark:bg-zinc-800 border-2 border-transparent focus:border-red-600 focus:bg-white dark:focus:bg-zinc-900 px-4 py-3 text-sm font-medium transition-all outline-none rounded-none";
-const BUTTON_PRIMARY = "bg-red-600 text-white font-bold uppercase py-4 px-8 hover:bg-black dark:hover:bg-white dark:hover:text-black transition-all text-sm tracking-widest active:scale-[0.98]";
+const BUTTON_PRIMARY = "bg-red-600 text-white font-bold uppercase py-4 px-8 hover:bg-red-700 dark:hover:bg-red-800 transition-all text-sm tracking-widest active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400";
 
 export default function BlogForm({ post }: BlogFormProps) {
     const [isPending, startTransition] = useTransition();

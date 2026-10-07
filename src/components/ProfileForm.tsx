@@ -203,10 +203,10 @@ export default function ProfileForm({
                 <div className="flex flex-col sm:flex-row gap-4">
                     <button
                         type="submit"
-                        className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest text-sm ${isPending && !reviewRequestId
-                            ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                        className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isPending && !reviewRequestId
+                            ? "bg-zinc-200 text-zinc-400"
                             : (!isDirty && !reviewRequestId && !isModal)
-                                ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                                ? "bg-zinc-200 text-zinc-400"
                                 : "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]"
                             }`}
                         disabled={(!isDirty && !reviewRequestId && !isModal) || (isPending && !reviewRequestId)}
