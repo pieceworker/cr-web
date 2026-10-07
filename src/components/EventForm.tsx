@@ -17,14 +17,25 @@ export default function EventForm({ event, onSuccess }: EventFormProps) {
     const [isUploading, setIsUploading] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(event?.image || null);
+    const [title, setTitle] = useState(event?.title || "");
+    const [description, setDescription] = useState(event?.description || "");
+    const [venue, setVenue] = useState(event?.venue || "");
+    const [city, setCity] = useState(event?.city || "");
+    const [date, setDate] = useState(event?.date || "");
+    const [time, setTime] = useState(event?.time || "");
+    const [link, setLink] = useState(event?.link || "");
 
     const isDirty = useMemo(() => {
         if (!event) return true;
-        // Approximate dirty check: since form uses defaultValue (uncontrolled),
-        // we treat edit mode as dirty if any file selected; else rely on interaction.
-        // Keeping simple: allow submit when editing to match UX expectation.
-        return file !== null || true;
-    }, [event, file]);
+        return title !== (event.title || "") ||
+            description !== (event.description || "") ||
+            venue !== (event.venue || "") ||
+            city !== (event.city || "") ||
+            date !== (event.date || "") ||
+            time !== (event.time || "") ||
+            link !== (event.link || "") ||
+            file !== null;
+    }, [title, description, venue, city, date, time, link, file, event]);
 
     const handleSubmit = async (formData: FormData) => {
         let imageUrl = event?.image || "";
@@ -75,8 +86,13 @@ export default function EventForm({ event, onSuccess }: EventFormProps) {
         if (!event) {
             setFile(null);
             setPreviewUrl(null);
-            const form = document.querySelector("#event-form") as HTMLFormElement;
-            if (form) form.reset();
+            setTitle("");
+            setDescription("");
+            setVenue("");
+            setCity("");
+            setDate("");
+            setTime("");
+            setLink("");
         }
     };
 
@@ -84,7 +100,7 @@ export default function EventForm({ event, onSuccess }: EventFormProps) {
         <form id="event-form" action={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
-                    <input name="title" required placeholder="Event Title" defaultValue={event?.title} className={INPUT} />
+                    <input name="title" required placeholder="Event Title" value={title} onChange={e => setTitle(e.target.value)} className={INPUT} />
                     <div className="space-y-1">
                         <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                             <span>Description (Markdown)</span>
@@ -93,19 +109,19 @@ export default function EventForm({ event, onSuccess }: EventFormProps) {
                         <textarea 
                             name="description" 
                             placeholder="Write event description using markdown..." 
-                            defaultValue={event?.description || ""} 
+                            value={description} onChange={e => setDescription(e.target.value)}
                             className={`${INPUT} h-28 font-mono text-xs resize-y`} 
                         />
                     </div>
-                    <input name="venue" required placeholder="Venue" defaultValue={event?.venue} className={INPUT} />
-                    <input name="city" placeholder="City" defaultValue={event?.city || ""} className={INPUT} />
+                    <input name="venue" required placeholder="Venue" value={venue} onChange={e => setVenue(e.target.value)} className={INPUT} />
+                    <input name="city" placeholder="City" value={city} onChange={e => setCity(e.target.value)} className={INPUT} />
                 </div>
                 <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
-                        <input name="date" type="date" required defaultValue={event?.date} className={INPUT} />
-                        <input name="time" type="time" required defaultValue={event?.time} className={INPUT} />
+                        <input name="date" type="date" required value={date} onChange={e => setDate(e.target.value)} className={INPUT} />
+                        <input name="time" type="time" required value={time} onChange={e => setTime(e.target.value)} className={INPUT} />
                     </div>
-                    <input name="link" placeholder="Event Link (Eventbrite, etc.)" defaultValue={event?.link || ""} className={INPUT} />
+                    <input name="link" placeholder="Event Link (Eventbrite, etc.)" value={link} onChange={e => setLink(e.target.value)} className={INPUT} />
                     
                     {previewUrl && (
                         <div className="space-y-1">

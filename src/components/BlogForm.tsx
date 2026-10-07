@@ -17,11 +17,13 @@ export default function BlogForm({ post }: BlogFormProps) {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [title, setTitle] = useState(post?.title || "");
+    const [body, setBody] = useState(post?.body || "");
 
     const isDirty = useMemo(() => {
         if (!post) return true;
-        return true;
-    }, [post]);
+        return title !== (post.title || "") || body !== (post.body || "") || file !== null;
+    }, [title, body, file, post]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -89,7 +91,8 @@ export default function BlogForm({ post }: BlogFormProps) {
                 <input
                     type="text"
                     name="title"
-                    defaultValue={post?.title}
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
                     required
                     className={INPUT_STYLE}
                     placeholder="ENTER POST TITLE"
@@ -104,7 +107,6 @@ export default function BlogForm({ post }: BlogFormProps) {
                         <div className="space-y-1">
                             <p className="block text-[10px] font-bold uppercase text-zinc-400 mb-1 tracking-widest">Current Image</p>
                             <div className="aspect-video w-full relative border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 overflow-hidden grayscale-[0.5]">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={post.image} alt="Current" className="object-cover w-full h-full" />
                             </div>
                         </div>
@@ -113,7 +115,6 @@ export default function BlogForm({ post }: BlogFormProps) {
                         <div className="space-y-1">
                             <p className="block text-[10px] font-bold uppercase text-green-600 mb-1 tracking-widest">New Preview</p>
                             <div className="aspect-video w-full relative border-2 border-green-500 bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={previewUrl} alt="Preview" className="object-cover w-full h-full" />
                             </div>
                         </div>
@@ -144,7 +145,8 @@ export default function BlogForm({ post }: BlogFormProps) {
                 <textarea
                     name="body"
                     required
-                    defaultValue={post?.body}
+                    value={body}
+                    onChange={e => setBody(e.target.value)}
                     rows={15}
                     className={`${INPUT_STYLE} resize-y font-mono text-xs`}
                     placeholder="# Main Header&#10;Write your post body here using markdown..."
