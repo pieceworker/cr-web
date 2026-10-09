@@ -57,12 +57,11 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* The Latest Revolution Diary */}
       {latestPost && (
         <section className="border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">
           <div className="flex justify-between items-end mb-8">
             <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter font-heading text-zinc-900 dark:text-white">
-              The <span className="text-red-600">Revolution</span><br/>Diaries
+              What's New
             </h2>
             <Link href="/blog" className="text-xs font-bold uppercase tracking-widest hover:text-red-600 transition-colors border-b-2 border-transparent hover:border-red-600">
               Read All Entries ↗
