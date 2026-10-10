@@ -3,9 +3,15 @@ import { BlogPost, User, isAdmin } from "@/lib/db";
 import Link from "next/link";
 import Image from "next/image";
 import { auth } from "@/auth";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 
 export const dynamic = "force-dynamic";
+
+const markdownComponents: Components = {
+    a: ({ href, children }) => (
+        <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+    ),
+};
 
 async function getBlogData() {
     
@@ -71,7 +77,7 @@ export default async function BlogPage() {
                                     </Link>
                                     
                                     <div className="prose prose-zinc dark:prose-invert prose-sm line-clamp-3 italic mb-6 prose-headings:text-base prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-headings:italic prose-headings:font-heading prose-a:hidden prose-img:hidden">
-                                        <ReactMarkdown>{post.body}</ReactMarkdown>
+                                        <ReactMarkdown components={markdownComponents}>{post.body}</ReactMarkdown>
                                     </div>
                                 </div>
                                 

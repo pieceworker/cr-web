@@ -2,10 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { env } from "cloudflare:workers";
 import { BlogPost } from "@/lib/db";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 
 
 export const dynamic = "force-dynamic";
+
+const markdownComponents: Components = {
+    a: ({ href, children }) => (
+        <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+    ),
+};
 
 export default async function Home() {
   
@@ -83,7 +89,7 @@ export default async function Home() {
                   <h3 className="text-3xl sm:text-4xl font-black uppercase italic tracking-tighter mb-4 leading-none">{latestPost.title}</h3>
               </Link>
               <div className="prose prose-zinc dark:prose-invert prose-sm line-clamp-3 italic mb-8 prose-headings:text-base prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tighter prose-headings:italic prose-headings:font-heading prose-a:hidden prose-img:hidden">
-                  <ReactMarkdown>{latestPost.body}</ReactMarkdown>
+                  <ReactMarkdown components={markdownComponents}>{latestPost.body}</ReactMarkdown>
               </div>
               <Link 
                   href={`/blog/${latestPost.id}`} 
