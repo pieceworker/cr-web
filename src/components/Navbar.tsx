@@ -10,9 +10,7 @@ export default async function Navbar() {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events', secondary: { name: 'Bookings', path: '/bookings' } },
-    { name: 'Chapters', path: '/chapters' },
-    { name: 'Artists', path: '/artists' },
-    { name: 'Donate', path: '/donate', secondary: { name: 'Be Involved', path: '/be-involved' } },
+    { name: 'Donate', path: '/donate' },
     { name: 'Media', path: '/media' },
     { name: 'Blog', path: '/blog' },
   ];
