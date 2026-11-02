@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { User, Chapter, UnifiedRequest } from "@/lib/db";
+import { User, Chapter, UnifiedRequest, Role } from "@/lib/db";
 import { updateProfile } from "@/lib/actions";
 
 interface ProfileFormProps {
@@ -36,6 +36,7 @@ export default function ProfileForm({
     const [name, setName] = useState(user.name || "");
     const [location, setLocation] = useState(user.location || "");
     const [bio, setBio] = useState(user.bio || "");
+    const [role, setRole] = useState(user.role);
     const [error, setError] = useState<string | null>(null);
 
     const isDirty = useMemo(() => {
@@ -52,11 +53,12 @@ export default function ProfileForm({
         const directorChaptersChanged = JSON.stringify([...directorChapters].sort()) !== JSON.stringify([...initialDirectorChapters].sort());
 
         return name !== (user.name || "") ||
+            (isAdmin ? role !== user.role : false) ||
             location !== (user.location || "") ||
             bio !== (user.bio || "") ||
             chaptersChanged ||
             directorChaptersChanged;
-    }, [name, location, bio, selectedChapters, directorChapters, user]);
+    }, [name, role, location, bio, selectedChapters, directorChapters, user, isAdmin]);
 
     const INPUT = "w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm disabled:bg-zinc-100 dark:disabled:bg-zinc-900 disabled:text-zinc-500";
     const LABEL = "block text-[10px] font-bold uppercase text-zinc-400 mb-1 tracking-widest";
@@ -100,6 +102,22 @@ export default function ProfileForm({
                             required
                         />
                     </div>
+                    {isAdmin && (
+                        <div>
+                            <label className={LABEL}>Account Role</label>
+                            <select
+                                name="role"
+                                value={role}
+                                onChange={(e) => setRole(e.target.value as Role)}
+                                className={INPUT}
+                            >
+                                <option value="Audience">Audience</option>
+                                <option value="Musician">Musician</option>
+                                <option value="Chapter Director">Chapter Director</option>
+                                {user.role === "Admin" && <option value="Admin" disabled>Admin</option>}
+                            </select>
+                        </div>
+                    )}
                 </div>
                 {user.role === 'Chapter Director' && (
                     <div className="px-2 py-6 sm:p-6 bg-red-50 dark:bg-red-900/10 border-2 border-red-600/20 space-y-4">
