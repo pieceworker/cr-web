@@ -23,7 +23,7 @@ export const metadata = {
 import { auth } from "@/auth";
 import { env } from "cloudflare:workers";
 import { User, Chapter } from "@/lib/db";
-import UserSetup from '@/components/UserSetup';
+
 
 export default async function RootLayout({
 	children,
@@ -54,8 +54,7 @@ export default async function RootLayout({
 						{children}
 					</div>
 					<div className="col-start-1 row-start-1 z-40 pointer-events-none">
-						<UserSetup user={user} chapters={chapters} />
-					</div>
+						</div>
 				</main>
 				<Footer /> {/* Global Footer added here */}
 			</body>
