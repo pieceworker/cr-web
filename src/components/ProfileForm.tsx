@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { User, Chapter, UnifiedRequest, Role } from "@/lib/db";
+import { User, Chapter, UnifiedRequest } from "@/lib/db";
 import { updateProfile } from "@/lib/actions";
 
 interface ProfileFormProps {
@@ -57,8 +57,6 @@ export default function ProfileForm({
             chaptersChanged ||
             directorChaptersChanged;
     }, [name, location, bio, selectedChapters, directorChapters, user]);
-
-    const isPending = !!pendingUserEdit || !!pendingRoleRequest;
 
     const INPUT = "w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 p-3 outline-none focus:border-red-600 transition-colors text-sm disabled:bg-zinc-100 dark:disabled:bg-zinc-900 disabled:text-zinc-500";
     const LABEL = "block text-[10px] font-bold uppercase text-zinc-400 mb-1 tracking-widest";
@@ -175,13 +173,8 @@ export default function ProfileForm({
                 <div className="flex flex-col sm:flex-row gap-4">
                     <button
                         type="submit"
-                        className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isPending && !reviewRequestId
-                            ? "bg-zinc-200 text-zinc-400"
-                            : (!isDirty &&)
-                                ? "bg-zinc-200 text-zinc-400"
-                                : "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]"
-                            }`}
-                        disabled={!isDirty && !isModal}
+                        className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed ${!isDirty ? "bg-zinc-200 text-zinc-400" : "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]"}`}
+                        disabled={!isDirty}
                     >
                         {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save Changes" : ("Save Changes"))}
                     </button>
