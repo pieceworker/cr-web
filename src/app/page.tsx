@@ -41,12 +41,7 @@ export default async function Home() {
             >
               Find an Event
             </Link>
-            <Link
-              href="/be-involved"
-              className="inline-flex items-center justify-center border-2 border-zinc-900 dark:border-white px-2 sm:px-8 h-14 font-bold text-zinc-900 dark:text-white hover:bg-zinc-900 hover:text-white dark:hover:bg-white dark:hover:text-black transition-all text-center uppercase"
-            >
-              Join the Revolution
-            </Link>
+
           </div>
         </div>
 
