@@ -730,17 +730,19 @@ export async function updateProfile(formData: FormData) {
     const location = formData.get("location") as string;
     const bio = formData.get("bio") as string;
     const chapters = formData.getAll("chapters") as string[];
-    const role = formData.get("role") as Role;
     const director_chapters = formData.getAll("director_chapters") as string[];
 
-    await createUnifiedRequest("USER_EDIT", session.user.id, {
+    if (chapters.length === 0) throw new Error("Please select at least one chapter you follow.");
+
+    const db = await getDB();
+    await db.prepare("UPDATE users SET name = ?, location = ?, bio = ?, chapters = ?, director_chapters = ? WHERE id = ?").bind(
         name,
         location,
         bio,
-        chapters,
-        role,
-        director_chapters
-    });
+        JSON.stringify(chapters),
+        director_chapters.length > 0 ? JSON.stringify(director_chapters) : null,
+        session.user.id
+    ).run();
 
     revalidatePath("/account");
     revalidatePath("/directories");

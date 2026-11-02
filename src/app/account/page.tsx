@@ -91,7 +91,7 @@ export default async function ProfilePage() {
                     <div className="w-full mt-auto">
                         <details className="w-full group">
                             <summary className="cursor-pointer bg-zinc-100 dark:bg-zinc-800/50 p-3 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 hover:text-red-600 list-none border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center group-open:bg-red-600 group-open:text-white group-open:hover:text-white transition-all">
-                                <span>Manage Profile & Role</span>
+                                <span>Manage Profile</span>
                                 <span className="group-open:rotate-180 transition-transform text-lg">▾</span>
                             </summary>
 

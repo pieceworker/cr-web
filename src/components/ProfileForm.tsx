@@ -25,7 +25,6 @@ export default function ProfileForm({
     isAdmin = false,
     reviewRequestId // Add this
 }: ProfileFormProps) {
-    const [role, setRole] = useState(user.role);
     const [selectedChapters, setSelectedChapters] = useState<string[]>(() => {
         try {
             return user.chapters ? JSON.parse(user.chapters) : [];
@@ -55,12 +54,11 @@ export default function ProfileForm({
         const directorChaptersChanged = JSON.stringify([...directorChapters].sort()) !== JSON.stringify([...initialDirectorChapters].sort());
 
         return name !== (user.name || "") ||
-            role !== user.role ||
             location !== (user.location || "") ||
             bio !== (user.bio || "") ||
             chaptersChanged ||
             directorChaptersChanged;
-    }, [name, role, location, bio, selectedChapters, directorChapters, user]);
+    }, [name, location, bio, selectedChapters, directorChapters, user]);
 
     const isPending = !!pendingUserEdit || !!pendingRoleRequest;
 
@@ -70,7 +68,7 @@ export default function ProfileForm({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         setError(null);
-        if (role === 'Chapter Director' && directorChapters.length === 0) {
+        if (user.role === 'Chapter Director' && directorChapters.length === 0) {
             e.preventDefault();
             setError("Chapter Directors must select at least one chapter as director.");
         }
@@ -94,16 +92,7 @@ export default function ProfileForm({
                 </div>
             )}
 
-            {isPending && !isModal && !reviewRequestId && (
-                <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-600 px-2 py-4 sm:p-4 mb-6">
-                    <p className="text-sm font-medium italic text-zinc-800 dark:text-zinc-200">
-                        A profile update or role change is currently pending approval.
-                        The form is disabled until the request is processed.
-                    </p>
-                </div>
-            )}
-
-            <fieldset disabled={isPending && !reviewRequestId} className="space-y-6">
+            <fieldset className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                     <div>
                         <label className={LABEL}>Display Name</label>
@@ -115,23 +104,8 @@ export default function ProfileForm({
                             required
                         />
                     </div>
-                    <div>
-                        <label className={LABEL}>Account Role</label>
-                        <select
-                            name="role"
-                            value={role}
-                            onChange={(e) => setRole(e.target.value as Role)}
-                            className={INPUT}
-                        >
-                            <option value="Audience">Audience</option>
-                            <option value="Musician">Musician</option>
-                            <option value="Chapter Director">Chapter Director</option>
-                            {user.role === "Admin" && <option value="Admin" disabled>Admin</option>}
-                        </select>
-                    </div>
                 </div>
-
-                {role === 'Chapter Director' && (
+                {user.role === 'Chapter Director' && (
                     <div className="px-2 py-6 sm:p-6 bg-red-50 dark:bg-red-900/10 border-2 border-red-600/20 space-y-4">
                         <label className={`${LABEL} text-red-600`}>Directorship Chapters (Min 1)</label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -205,13 +179,13 @@ export default function ProfileForm({
                         type="submit"
                         className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isPending && !reviewRequestId
                             ? "bg-zinc-200 text-zinc-400"
-                            : (!isDirty && !reviewRequestId && !isModal)
+                            : (!isDirty && !isModal)
                                 ? "bg-zinc-200 text-zinc-400"
                                 : "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]"
                             }`}
-                        disabled={(!isDirty && !reviewRequestId && !isModal) || (isPending && !reviewRequestId)}
+                        disabled={!isDirty && !isModal}
                     >
-                        {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save Changes" : (isPending ? "Request Pending" : (isModal ? "Complete Setup" : "Save Changes")))}
+                        {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save Changes" : (isModal ? "Complete Setup" : "Save Changes"))}
                     </button>
                     {isAdmin && reviewRequestId && (
                         <button
