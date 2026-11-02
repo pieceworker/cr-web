@@ -660,7 +660,6 @@ export async function deleteUser(userId: string) {
     // 4. Prepare batch statements
     const statements = [
         db.prepare("DELETE FROM users WHERE id = ?").bind(userId),
-        db.prepare("DELETE FROM role_requests WHERE user_id = ?").bind(userId),
         db.prepare("DELETE FROM requests WHERE user_id = ? OR target_id = ?").bind(userId, userId),
         db.prepare("DELETE FROM bookings WHERE created_by = ?").bind(userId),
         db.prepare("DELETE FROM booking_artists WHERE booking_id IN (SELECT id FROM bookings WHERE created_by = ?)").bind(userId),
