@@ -148,7 +148,7 @@ export default function ProfileForm({
                                         checked={selectedChapters.includes(c.id)}
                                         onChange={(e) => {
                                             if (e.target.checked) setSelectedChapters([...selectedChapters, c.id]);
-                                            else setSelectedChapters(selectedChapters.filter(id => id !== c.id));
+                                            else if (selectedChapters.length > 1) setSelectedChapters(selectedChapters.filter(id => id !== c.id));
                                         }}
                                         className="accent-red-600"
                                     />
