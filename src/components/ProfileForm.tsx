@@ -2,12 +2,11 @@
 
 import { useState, useMemo } from "react";
 import { User, Chapter, UnifiedRequest, Role } from "@/lib/db";
-import { updateProfile, completeUserSetup } from "@/lib/actions";
+import { updateProfile } from "@/lib/actions";
 
 interface ProfileFormProps {
     user: User;
     chapters: Chapter[];
-    isModal?: boolean;
     pendingUserEdit?: UnifiedRequest;
     pendingRoleRequest?: UnifiedRequest;
     action?: (formData: FormData) => Promise<void>; // Accept custom action for admin use
@@ -18,7 +17,6 @@ interface ProfileFormProps {
 export default function ProfileForm({
     user,
     chapters,
-    isModal = false,
     pendingUserEdit,
     pendingRoleRequest,
     action: customAction,
@@ -81,8 +79,8 @@ export default function ProfileForm({
     return (
         <form
             onSubmit={handleSubmit}
-            action={customAction || (isModal ? completeUserSetup : updateProfile)}
-            className={`space-y-6 ${isModal ? "" : "mt-6"}`}
+            action={customAction || updateProfile}
+            className={`space-y-6`}
         >
             <input type="hidden" name="id" value={user.id} />
             {reviewRequestId && <input type="hidden" name="reviewRequestId" value={reviewRequestId} />}
@@ -179,13 +177,13 @@ export default function ProfileForm({
                         type="submit"
                         className={`flex-1 font-bold uppercase py-4 transition-all tracking-widest text-sm disabled:opacity-50 disabled:cursor-not-allowed ${isPending && !reviewRequestId
                             ? "bg-zinc-200 text-zinc-400"
-                            : (!isDirty && !isModal)
+                            : (!isDirty &&)
                                 ? "bg-zinc-200 text-zinc-400"
                                 : "bg-red-600 text-white hover:bg-red-700 active:scale-[0.98]"
                             }`}
                         disabled={!isDirty && !isModal}
                     >
-                        {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save Changes" : (isModal ? "Complete Setup" : "Save Changes"))}
+                        {isAdmin && reviewRequestId ? "Approve & Save Changes" : (isAdmin ? "Save Changes" : ("Save Changes"))}
                     </button>
                     {isAdmin && reviewRequestId && (
                         <button
