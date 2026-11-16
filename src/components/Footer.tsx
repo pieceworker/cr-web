@@ -37,7 +37,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black py-12 transition-colors">
-      <div className="max-w-6xl mx-auto px-2 sm:px-6 mt-8 border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col items-center">
+      <div className="max-w-6xl mx-auto px-2 sm:px-6 mt-8 pt-8 flex flex-col items-center">
         <MailchimpSignup
           heading="Join our mailing list"
           subheading="Get updates on concerts, chamber jams, and Classical Revolution news."

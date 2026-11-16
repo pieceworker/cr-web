@@ -96,22 +96,6 @@ export default async function Home() {
           </div>
         </section>
       )}
-
-      {/* Mission Highlights */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-10">
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold uppercase tracking-tighter text-zinc-900 dark:text-white">40+ Chapters</h3>
-          <p className="text-sm text-zinc-600 dark:text-zinc-500">A global network of musicians dedicated to accessibility.</p>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold uppercase tracking-tighter text-zinc-900 dark:text-white">Unstuffy</h3>
-          <p className="text-sm text-zinc-600 dark:text-zinc-500">No dress codes. No silence between movements. Just music.</p>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold uppercase tracking-tighter text-zinc-900 dark:text-white">Artist Driven</h3>
-          <p className="text-sm text-zinc-600 dark:text-zinc-500">Providing platforms for world-class musicians to play freely.</p>
-        </div>
-      </section>
     </div>
   );
 }
