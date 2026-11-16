@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
+
 	title: 'Classical Revolution | Chamber Music for the People',
 	description: 'Bringing classical music to neighborhood hangouts since 2006.',
 	icons: {
@@ -35,7 +36,7 @@ export default async function RootLayout({
 	let chapters: Chapter[] = [];
 
 	if (session?.user?.email) {
-		
+
 		const db = env.DB;
 		user = await db.prepare("SELECT * FROM users WHERE id = ?").bind(session.user.id).first() as User | null;
 		const chaptersResult = await db.prepare("SELECT * FROM chapters").all();
@@ -45,7 +46,6 @@ export default async function RootLayout({
 	return (
 		<html lang="en">
 			<head>
-				<script id="mcjs" dangerouslySetInnerHTML={{ __html: `!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/a3476f0ba3a89ad4a4df5c773/94a427965d347195db66a44ed.js");` }} />
 			</head>
 			<body className={`${inter.className} antialiased bg-white dark:bg-black text-zinc-900 dark:text-zinc-100 min-h-screen flex flex-col transition-colors`}>
 				<Navbar />
@@ -54,7 +54,7 @@ export default async function RootLayout({
 						{children}
 					</div>
 					<div className="col-start-1 row-start-1 z-40 pointer-events-none">
-						</div>
+					</div>
 				</main>
 				<Footer /> {/* Global Footer added here */}
 			</body>
