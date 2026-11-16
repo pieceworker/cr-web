@@ -37,6 +37,13 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black py-12 transition-colors">
+      <div className="max-w-6xl mx-auto px-2 sm:px-6 mt-8 border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col items-center">
+        <MailchimpSignup
+          heading="Join our mailing list"
+          subheading="Get updates on concerts, chamber jams, and Classical Revolution news."
+        />
+      </div>
+
       <div className="max-w-6xl mx-auto px-2 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="space-y-2 text-center md:text-left">
           <Link
@@ -79,13 +86,6 @@ export default function Footer() {
             San Francisco, CA
           </p>
         </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-2 sm:px-6 mt-8 border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col items-center">
-        <MailchimpSignup
-          heading="Join our mailing list"
-          subheading="Get updates on concerts, chamber jams, and Classical Revolution news."
-        />
       </div>
     </footer>
   );
