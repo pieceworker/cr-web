@@ -8,53 +8,6 @@ interface MediaGalleryProps {
     items: MediaItem[];
 }
 
-function YouTubeThumb({ videoId }: { videoId: string }) {
-  // YouTube serves actual frames from throughout the video at /0.jpg .. /3.jpg
-  const [frame, setFrame] = useState<"default" | 0 | 1 | 2 | 3>("default");
-  const timerRef = useRef<number | null>(null);
-
-  const startPreview = () => {
-    const frames: ("default" | 0 | 1 | 2 | 3)[] = [0, 1, 2, 3];
-    let i = 0;
-    setFrame(frames[i]);
-    timerRef.current = window.setInterval(() => {
-      i = (i + 1) % frames.length;
-      setFrame(frames[i]);
-    }, 400);
-  };
-
-  const stopPreview = () => {
-    if (timerRef.current !== null) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setFrame("default");
-  };
-
-  const thumbSrc =
-    frame === "default"
-      ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-      : `https://img.youtube.com/vi/${videoId}/${frame}.jpg`;
-
-  return (
-    <div
-      className="w-full h-full bg-zinc-800 relative flex items-center justify-center overflow-hidden"
-      onMouseEnter={startPreview}
-      onMouseLeave={stopPreview}
-    >
-      <img
-        src={thumbSrc}
-        alt="YouTube preview"
-        className="object-cover group-hover:scale-105 transition-transform duration-300"
-        style={{ width: "100%", height: "100%" }}
-      />
-      <div className="absolute z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
-        <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-white border-b-[8px] border-b-transparent ml-1" />
-      </div>
-    </div>
-  );
-}
-
 export default function MediaGallery({ items }: MediaGalleryProps) {
     const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
     const touchStartX = useRef<number | null>(null);
@@ -122,8 +75,22 @@ export default function MediaGallery({ items }: MediaGalleryProps) {
             );
         } else if (item.type === 'youtube') {
             const videoId = getYouTubeId(item.url);
-            if (!videoId) return null;
-            return <YouTubeThumb videoId={videoId} />;
+            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
+            return (
+                <div className="w-full h-full bg-zinc-800 relative flex items-center justify-center overflow-hidden">
+                    {thumbUrl && (
+                      <img
+                        src={thumbUrl}
+                        alt="YouTube thumb"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        style={{ width: "100%", height: "100%" }}
+                      />
+                    )}
+                    <div className="absolute z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                        <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-white border-b-[8px] border-b-transparent ml-1" />
+                    </div>
+                </div>
+            );
         }
     };
 
