@@ -75,10 +75,28 @@ export default function MediaGallery({ items }: MediaGalleryProps) {
             );
         } else if (item.type === 'youtube') {
             const videoId = getYouTubeId(item.url);
-            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null;
+            const [thumbSrc, setThumbSrc] = useState<string | null>(
+              videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
+            );
+            const fallbackThumb = videoId
+              ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+              : null;
             return (
                 <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                    {thumbUrl && <Image src={thumbUrl} alt="YouTube thumb" fill className="object-cover group-hover:scale-105 transition-transform duration-300" unoptimized />}
+                    {thumbSrc && (
+                      <Image
+                        src={thumbSrc}
+                        alt="YouTube thumb"
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        unoptimized
+                        onError={() => {
+                          if (fallbackThumb && thumbSrc !== fallbackThumb) {
+                            setThumbSrc(fallbackThumb);
+                          }
+                        }}
+                      />
+                    )}
                     <div className="relative z-10 w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
                         <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-white border-b-[8px] border-b-transparent ml-1" />
                     </div>
