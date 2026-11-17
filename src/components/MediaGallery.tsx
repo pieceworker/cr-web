@@ -77,7 +77,7 @@ export default function MediaGallery({ items }: MediaGalleryProps) {
             const videoId = getYouTubeId(item.url);
             const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
             return (
-                <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                <div className="w-full h-full bg-zinc-800 relative flex items-center justify-center overflow-hidden">
                     {thumbUrl && (
                       <img
                         src={thumbUrl}
@@ -86,7 +86,7 @@ export default function MediaGallery({ items }: MediaGalleryProps) {
                         style={{ width: "100%", height: "100%" }}
                       />
                     )}
-                    <div className="relative z-10 w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                    <div className="absolute z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
                         <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-white border-b-[8px] border-b-transparent ml-1" />
                     </div>
                 </div>
