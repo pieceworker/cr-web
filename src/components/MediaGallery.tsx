@@ -75,26 +75,15 @@ export default function MediaGallery({ items }: MediaGalleryProps) {
             );
         } else if (item.type === 'youtube') {
             const videoId = getYouTubeId(item.url);
-            const [thumbSrc, setThumbSrc] = useState<string | null>(
-              videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
-            );
-            const fallbackThumb = videoId
-              ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-              : null;
+            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
             return (
                 <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                    {thumbSrc && (
-                      <Image
-                        src={thumbSrc}
+                    {thumbUrl && (
+                      <img
+                        src={thumbUrl}
                         alt="YouTube thumb"
-                        fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        unoptimized
-                        onError={() => {
-                          if (fallbackThumb && thumbSrc !== fallbackThumb) {
-                            setThumbSrc(fallbackThumb);
-                          }
-                        }}
+                        style={{ width: "100%", height: "100%" }}
                       />
                     )}
                     <div className="relative z-10 w-12 h-12 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
